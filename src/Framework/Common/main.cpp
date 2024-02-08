@@ -8,7 +8,7 @@ using namespace nova;
 int main(int argc, char** argv) {
   int res;
   if ((res = app->Initialize()) != 0) {
-    printf("error code:%d", res);
+    printf("error code:%d\n", res);
     return res;
   }
   while (!app->IsQuit()) {
