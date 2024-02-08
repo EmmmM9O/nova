@@ -1,4 +1,4 @@
-#include "../Framework/Common/BaseApplication.hpp"
+#include "../Framework/Common/Applications.hpp"
 namespace nova {
 BaseApplication appl;
 Application* app = &appl;

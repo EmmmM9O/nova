@@ -1,4 +1,4 @@
-#include "BaseApplication.hpp"
+#include "Applications.hpp"
 #include <cstdio>
 namespace nova {
 void BaseApplication::Finalize() {}
