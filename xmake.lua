@@ -1,9 +1,18 @@
 add_rules("mode.debug", "mode.release")
-add_requires("glfw")
+add_requires("glfw", "glad", "stb")
+task("format")
+  set_category("plugin")
+  on_run("format")
+  set_menu({
+	  usage = "xmake format",
+	  description = "Format source code",
+  })
+task_end()
 target("nova")
-    set_kind("binary")
-    add_files("src/**.cpp")
-    add_packages("glfw")
+  set_kind("binary")
+  add_cxxflags("-Wall")
+  add_files("src/**.cpp", "/usr/src/gl.c")
+  add_packages("glfw", "glad", "stb")
 
 --
 -- If you want to known more usage about xmake, please see https://xmake.io
@@ -73,4 +82,3 @@ target("nova")
 --
 -- @endcode
 --
-
