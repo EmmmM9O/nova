@@ -1,23 +1,19 @@
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-#include <glad/gl.h>
-int main(void) {
-  GLFWwindow* window;
-  if (!glfwInit()) return -1;
-  window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
-  if (!window) {
-    glfwTerminate();
-    return -1;
-  }
-  glfwMakeContextCurrent(window);
+#include <cstdio>
 
-  gladLoadGL(glfwGetProcAddress);
-
-  while (!glfwWindowShouldClose(window)) {
-    glClear(GL_COLOR_BUFFER_BIT);
-    glfwSwapBuffers(window);
-    glfwPollEvents();
+#include "../Interface/Interface.hpp"
+namespace nova {
+extern Application* app;
+}
+using namespace nova;
+int main(int argc, char** argv) {
+  int res;
+  if ((res = app->Initialize()) != 0) {
+    printf("error code:%d", res);
+    return res;
   }
-  glfwTerminate();
+  while (!app->IsQuit()) {
+    app->Tick();
+  }
+  app->Finalize();
   return 0;
 }
