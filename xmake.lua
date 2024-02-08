@@ -1,5 +1,7 @@
+add_rules("plugin.compile_commands.autoupdate", {outputdir = ".vscode"})
 add_rules("mode.debug", "mode.release")
 add_requires("glfw", "glad", "stb")
+set_languages("c++2c")
 task("format")
   set_category("plugin")
   on_run("format")
@@ -11,8 +13,10 @@ task_end()
 target("nova")
   set_kind("binary")
   add_cxxflags("-Wall")
-  add_files("src/**.cpp", "/usr/src/gl.c")
+  add_files("src/**.cpp","src/**.mpp", "/usr/src/gl.c")
+  set_policy("build.c++.modules", true)
   add_packages("glfw", "glad", "stb")
+  set_languages("c++2c")
 
 --
 -- If you want to known more usage about xmake, please see https://xmake.io
