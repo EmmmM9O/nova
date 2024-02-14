@@ -1,0 +1,29 @@
+CompileFlags:
+  Add: [-std=c++2a,-I/home/novarc/nova,-Wall]
+  Compiler: clang++
+Diagnostics:
+  UnusedIncludes: Strict
+  ClangTidy:
+    Add: []
+    Remove:
+       [
+        abseil*,
+        fuchsia*,
+        lvmlib*,
+        zircon*,
+        altera*,
+        google-readability-todo,
+        readability-braces-around-statements,
+        hicpp-braces-around-statements,
+        modernize-use-trailing-return-type,
+      ]
+    CheckOptions:
+      readability-identifier-naming.VariableCase: CamelCase
+InlayHints:
+  Designators: Yes
+  Enabled: Yes
+  ParameterNames: Yes
+  DeducedTypes: Yes
+  BlockEnd: Yes
+If:
+  PathMatch: ./**.hpp  

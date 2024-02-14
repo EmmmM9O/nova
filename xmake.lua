@@ -1,35 +1,49 @@
-add_rules("plugin.compile_commands.autoupdate", {outputdir = ".vscode"})
+add_rules("plugin.compile_commands.autoupdate", { outputdir = ".vscode" })
 add_rules("mode.debug", "mode.release")
-add_requires("glfw", "glad", "stb")
+add_requires("glfw", "glad", "stb", "fmt")
 set_languages("c++2a")
-local sys = is_os("windows") and "Windows" or is_os("macosx") and "Macosx" or is_os("linux") and "Linux"
+local sys = is_os("windows") and "windows" or is_os("linux") and "linux"
 task("format")
-  set_category("plugin")
-  on_run("format")
-  set_menu({
-	  usage = "xmake format",
-	  description = "Format source code",
-  })
+set_category("plugin")
+on_run("format")
+set_menu({
+	usage = "xmake format",
+	description = "Format source code",
+})
 task_end()
 target("nova-core")
-  set_kind("static")
-  add_cxxflags("-Wall")
-  add_files("src/Framework/**.cpp", "/usr/src/gl.c","src/Platform/"..sys.."/**.cpp")
-  --set_policy("build.c++.modules", true)
-  add_packages("glfw", "glad", "stb")
-  set_languages("c++2a")
+set_kind("static")
+add_cxxflags("-Wall")
+add_files("core/**.cpp", "/usr/src/gl.c", sys .. "/**.cpp")
+add_includedirs("$(projectdir)")
+add_packages("glfw", "glad", "stb", "fmt")
+set_languages("c++2a")
+
+target("nova-desktop")
+set_kind("static")
+add_includedirs("$(projectdir)")
+add_cxxflags("-Wall")
+add_deps("nova-core")
+set_languages("c++2a")
+add_files("desktop/**.cpp")
+
 target("test")
-    set_kind("binary")
-  add_cxxflags("-Wall")
-    add_files("src/test/**.cpp")
-    add_deps("nova-core")
-  set_languages("c++2a")
-target("linux")
-    set_kind("binary")
-  add_cxxflags("-Wall")
-    add_files("src/Linux/**.cpp")
-    add_deps("nova-core")
-  set_languages("c++2a")
+set_kind("binary")
+add_includedirs("$(projectdir)")
+add_cxxflags("-Wall")
+add_files("test/**.cpp")
+add_deps("nova-core", "nova-desktop")
+set_languages("c++2a")
+--[[
+target("LinuxDesktop")
+set_kind("binary")
+add_includedirs("$(projectdir)")
+add_cxxflags("-Wall")
+add_files("linux/**.cpp")
+add_deps("nova-core","nova-desktop")
+set_languages("c++2a")
+]]
+--
 after_build(function(target)
 	local outputdir = target:targetdir() -- 获取输出目录
 	local assetsdir = os.args("assets/") -- 获取 assets 目录的绝对路径

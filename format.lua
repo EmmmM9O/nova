@@ -6,7 +6,7 @@ function traverseDir(path)
 	end
   local files2 = os.files(path .. "/**.hpp")
     for _,file in ipairs(files2) do
-    os.exec("clang-format --style='file:"..path..".clang-format' -i " .. file)
+    os.exec("clang-format --style='file:"..path.."/.clang-format' -i " .. file)
     print("format ", file)
     end
 end
