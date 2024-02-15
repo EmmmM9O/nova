@@ -3,22 +3,22 @@ CompileFlags:
   Compiler: clang++
 Diagnostics:
   UnusedIncludes: Strict
-  ClangTidy:
-    Add: []
-    Remove:
-       [
-        abseil*,
-        fuchsia*,
-        lvmlib*,
-        zircon*,
-        altera*,
-        google-readability-todo,
-        readability-braces-around-statements,
-        hicpp-braces-around-statements,
-        modernize-use-trailing-return-type,
-      ]
-    CheckOptions:
-      readability-identifier-naming.VariableCase: CamelCase
+    #ClangTidy:
+    # Add: []
+    #  Remove:
+    #   [
+    #    abseil*,
+    #     fuchsia*,
+    #    lvmlib*,
+        #    zircon*,
+        #    altera*,
+        #    google-readability-todo,
+        #    readability-braces-around-statements,
+        #    #    hicpp-braces-around-statements,
+        #    modernize-use-trailing-return-type,
+        #   ]
+        # CheckOptions:
+        #  readability-identifier-naming.VariableCase: CamelCase
 InlayHints:
   Designators: Yes
   Enabled: Yes

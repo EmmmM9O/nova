@@ -7,12 +7,11 @@
 
 #include "function.hpp"
 namespace nova {
-enum class systemType { Android, Linux, Window ,Undefined};
+enum class systemType { Android, Linux, Window, Undefined };
 enum class runType { Desktop, Headless };
 class Disposable {
  public:
   virtual void dispose() = 0;
-  virtual bool isDisposed() = 0;
 };
 class ApplicationListener {
  public:
@@ -23,14 +22,14 @@ class ApplicationListener {
   virtual void resume() = 0;
   virtual void dispose() = 0;
   virtual void exit() = 0;
-  virtual void fileDropped(std::filesystem::path path);
+  virtual void fileDropped(std::filesystem::path path) = 0;
 };
+typedef std::vector<std::shared_ptr<ApplicationListener>> listenersType;
 class Application : public Disposable {
  protected:
   static std::mutex mt;
 
  public:
-  using listenersType = std::vector<std::shared_ptr<ApplicationListener>>;
   virtual listenersType& getListeners() = 0;
   virtual void addListener(std::shared_ptr<ApplicationListener> listener);
   virtual void removeListener(std::shared_ptr<ApplicationListener> listener);
@@ -42,7 +41,7 @@ class Application : public Disposable {
   virtual bool isWindow();
   virtual bool isLinux();
   virtual bool isAndroid();
-  virtual int getVersion() = 0;
+  virtual int getVersion();
   virtual std::string getClipboardText() = 0;
   virtual void post(Runnable runnable) = 0;
   virtual void setClipboardText(std::string text) = 0;
@@ -50,5 +49,20 @@ class Application : public Disposable {
   virtual bool openURI(std::string url);
   virtual void dispose() override;
   virtual void exit() = 0;
+};
+class ApplicationCore : public ApplicationListener {
+ protected:
+  listenersType modules;
+
+ public:
+  void add(std::shared_ptr<ApplicationListener> module);
+  virtual void setup() = 0;
+  void init() override;
+  void resize(int width, int height) override;
+  void update() override;
+  void pause() override;
+  void resume() override;
+  void dispose() override;
+  void fileDropped(std::filesystem::path path) override;
 };
 }  // namespace nova

@@ -1,8 +1,9 @@
 #pragma once
+#include <fmt/core.h>
+
 #include <string>
 
 #include "core/application.hpp"
-#include <fmt/core.h>
 namespace nova {
 class OS {
  public:

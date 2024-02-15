@@ -16,7 +16,7 @@ set_kind("static")
 add_cxxflags("-Wall")
 add_files("core/**.cpp", "/usr/src/gl.c", sys .. "/**.cpp")
 add_includedirs("$(projectdir)")
-add_packages("glfw", "glad", "stb", "fmt")
+add_packages("glfw", "glad", "stb", "fmt","pthread")
 set_languages("c++2a")
 
 target("nova-desktop")
