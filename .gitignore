@@ -36,5 +36,5 @@ build/
 
 .vscode
 
-andorid/target
-andorid/lib
+android/target
+android/lib/
