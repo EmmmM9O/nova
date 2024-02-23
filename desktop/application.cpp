@@ -1,20 +1,19 @@
-#include <glad/gl.h>
 
-#include <mutex>
-#include <string>
+#include "application.hpp"
 
-#include "core/OS.hpp"
-#include "core/function.hpp"
-#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 #include <iostream>
 #include <memory>
+#include <mutex>
+#include <string>
 
-#include "application.hpp"
 #include "core/Core.hpp"
+#include "core/Log.hpp"
+#include "core/OS.hpp"
 #include "core/Threads.hpp"
 #include "core/application.hpp"
+#include "core/function.hpp"
 
 namespace nova {
 DesktopApplication::DesktopApplication(
@@ -47,15 +46,21 @@ void DesktopApplication::setClipboardText(std::string text) {
 }
 int DesktopApplication::init() {
   listen([](std::shared_ptr<ApplicationListener> l) -> void { l->init(); });
-  if (!glfwInit()) return -1;
+  glfwSetErrorCallback([](int code, const char* str) -> void {
+        Log_error("glfw error code : {} {}",code,str);
+  });
+  if (!glfwInit()) {
+    Log_error("glfw {} error", "init");
+    return -1;
+  }
   window = glfwCreateWindow(config.width, config.height, config.title.c_str(),
                             NULL, NULL);
   if (!window) {
     glfwTerminate();
+    Log_error("glfw {} error", "window");
     return -1;
   }
   glfwMakeContextCurrent(window);
-  gladLoadGL(glfwGetProcAddress);
 
   return 0;
 }

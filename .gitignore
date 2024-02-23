@@ -38,3 +38,4 @@ build/
 
 android/target
 android/lib/
+*.log
