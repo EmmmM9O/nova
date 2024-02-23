@@ -27,7 +27,7 @@
     <dependency>
       <groupId>com.google.android</groupId>
       <artifactId>android</artifactId>
-      <version>1.0.0</version>
+      <version>31</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
