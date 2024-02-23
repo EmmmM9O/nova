@@ -16,7 +16,7 @@
 *.dylib
 *.dll
 
-# Fortran module files
+# Fortran module filesando
 *.mod
 *.smod
 
@@ -38,5 +38,8 @@ build/
 
 android/target
 android/lib/
+android/.settings/
+android/.classpath
+android/.project
 *.log
 
