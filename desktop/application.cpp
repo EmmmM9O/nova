@@ -1,7 +1,6 @@
 
 #include "application.hpp"
 
-#include <GLFW/glfw3.h>
 
 #include <iostream>
 #include <memory>
@@ -24,7 +23,6 @@ DesktopApplication::DesktopApplication(
     loop();
     glfwTerminate();
   } else {
-    std::cout << "create window Error" << std::endl;
     return;
   }
   listen([](std::shared_ptr<ApplicationListener> l) -> void { l->exit(); });
@@ -57,11 +55,11 @@ int DesktopApplication::init() {
                             NULL, NULL);
   if (!window) {
     glfwTerminate();
-    Log_error("glfw {} error", "window");
+    Log_error("glfw {} error", "window create");
     return -1;
   }
   glfwMakeContextCurrent(window);
-
+  gladLoadGL(glfwGetProcAddress);
   return 0;
 }
 void DesktopApplication::loop() {
@@ -88,12 +86,10 @@ void DesktopApplication::listen(
   }
 }
 void DesktopApplication::cleanup() {
-  std::cout << "test4" << std::endl;
   listen([](std::shared_ptr<ApplicationListener> l) -> void {
     l->pause();
     l->dispose();
   });
-  std::cout << "test5" << std::endl;
   dispose();
 }
 void DesktopApplication::addListener(
