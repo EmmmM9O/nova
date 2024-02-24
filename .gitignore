@@ -49,4 +49,5 @@ android/src/main/java/nova/android/R.java
 *.jks
 *.keystore
 android/dist
+libs/
 

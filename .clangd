@@ -1,5 +1,5 @@
 CompileFlags:
-  Add: [-std=c++2a,-I/home/novarc/nova,-Wall]
+  Add: [-std=c++2a,-I/home/novarc/nova,-Wall,-stdlib=libc++,-I/home/novarc/nova/include]
   Compiler: clang++
 Diagnostics:
   UnusedIncludes: Strict

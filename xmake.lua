@@ -11,10 +11,11 @@ set_menu({
 	description = "Format source code",
 })
 task_end()
+
 target("nova-core")
 set_kind("static")
 add_cxxflags("-Wall")
-add_files("core/**.cpp", sys .. "/**.cpp")
+add_files("core/**.cpp")
 add_includedirs("$(projectdir)")
 add_packages("stb", "fmt","pthread")
 set_languages("c++2a")
@@ -26,7 +27,7 @@ add_cxxflags("-Wall")
 add_packages("glfw")
 add_deps("nova-core")
 set_languages("c++2a")
-add_files("desktop/**.cpp","include/glad.c")
+add_files("desktop/**.cpp",sys .. "/**.cpp","desktop/include/glad.c")
 
 target("test")
 set_kind("binary")
@@ -37,13 +38,14 @@ add_deps("nova-core", "nova-desktop")
 set_languages("c++2a")
 --[[
 target("android")
-set_kind("binary")
-add_includedirs("$(projectdir)")
-add_cxxflags("-Wall")
-add_files("andorid/csrc/**.cpp")
+set_kind("shared")
+add_includedirs("$(projectdir)","include")
+add_cxxflags("-Wall","-stdlib=libc++")
+add_ldflags("-stdlib=libc++")
+add_files("android/src/main/cpp/**.cpp")
 add_deps("nova-core")
 set_languages("c++2a")
-]]--
+
 --[[
 target("LinuxDesktop")
 set_kind("binary")
