@@ -43,6 +43,7 @@ android/.classpath
 android/.project
 android/gen
 android/build
+android/src/main/java/nova/android/R.java
 *.log
 *.apk
 *.jks
