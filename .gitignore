@@ -41,5 +41,11 @@ android/lib/
 android/.settings/
 android/.classpath
 android/.project
+android/gen
+android/build
 *.log
+*.apk
+*.jks
+*.keystore
+android/dist
 
