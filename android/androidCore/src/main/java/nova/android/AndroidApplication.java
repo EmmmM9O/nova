@@ -1,5 +1,4 @@
 package nova.android;
-
 import android.app.Activity;
 import android.os.Bundle;
 public class AndroidApplication extends Activity {
