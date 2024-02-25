@@ -1,8 +1,8 @@
 add_rules("plugin.compile_commands.autoupdate", { outputdir = ".vscode" })
 add_rules("mode.debug", "mode.release")
-add_requires("glfw", "stb", "fmt")
+add_requires("glfw", "fmt")
 set_languages("c++2a")
-local sys = is_os("windows") and "windows" or is_os("linux") and "linux"
+local sys = is_os("windows") and "windows" or is_os("linux") and "linux" 
 task("format")
 set_category("plugin")
 on_run("format")
@@ -27,7 +27,7 @@ add_cxxflags("-Wall")
 add_packages("glfw")
 add_deps("nova-core")
 set_languages("c++2a")
-add_files("desktop/**.cpp",sys .. "/**.cpp","desktop/include/glad.c")
+add_files("desktop/**.cpp", sys.."/**.cpp","desktop/**.c")
 
 target("test")
 set_kind("binary")
@@ -36,15 +36,7 @@ add_cxxflags("-Wall")
 add_files("test/**.cpp")
 add_deps("nova-core", "nova-desktop")
 set_languages("c++2a")
---[[
-target("android")
-set_kind("shared")
-add_includedirs("$(projectdir)","include")
-add_cxxflags("-Wall","-stdlib=libc++")
-add_ldflags("-stdlib=libc++")
-add_files("android/src/main/cpp/**.cpp")
-add_deps("nova-core")
-set_languages("c++2a")
+
 
 --[[
 target("LinuxDesktop")

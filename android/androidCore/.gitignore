@@ -36,8 +36,20 @@ build/
 
 .vscode
 
+target
+lib/
+.settings/
+.classpath
+.project
+gen
+build
 *.log
 *.apk
 *.jks
 *.keystore
-
+dist
+libs/
+tmp/
+libs/
+obj/
+src/nova/android/R.java

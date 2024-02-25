@@ -1,0 +1,13 @@
+CompileFlags:
+  Add: [-std=c++2a,-I/home/novarc/nova/android,-Wall,-stdlib=libc++,-I/home/novarc/nova/android/src/include,-I/home/novarc/nova]
+  Compiler: clang++
+Diagnostics:
+  UnusedIncludes: Strict
+InlayHints:
+  Designators: Yes
+  Enabled: Yes
+  ParameterNames: Yes
+  DeducedTypes: Yes
+  BlockEnd: Yes
+If:
+  PathMatch: ./**.hpp  
