@@ -18,11 +18,9 @@ class logger {
  public:
   std::time_t time = std::time(nullptr);
   const bool useColors = true;
-  std::filesystem::path LogDir;
   std::string_view formatStyle =
       "[{level}][{time:%H:%M:%S %Y-%m-%d}][File:[{file}] Func:[{function}] "
       "Line:[{line}]]\n>{context}";
-  void init(std::filesystem::path logDir);
   template <typename... Args>
   std::string format(fmt::format_string<Args...> str, Args&&... args) {
     return fmt::vformat(str, fmt::make_format_args(args...));
@@ -41,7 +39,6 @@ class logger {
 class Log {
  public:
   static logger my_logger;
-  static void init(std::filesystem::path path);
   template <typename... Args>
   static void log(const std::source_location& location, const LogLevel& level,
                   fmt::format_string<Args...> str, Args&&... args) {

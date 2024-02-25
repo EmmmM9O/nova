@@ -1,5 +1,4 @@
 #pragma once
-#include <filesystem>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -22,7 +21,6 @@ class ApplicationListener {
   virtual void resume() = 0;
   virtual void dispose() = 0;
   virtual void exit() = 0;
-  virtual void fileDropped(std::filesystem::path path) = 0;
 };
 typedef std::vector<std::shared_ptr<ApplicationListener>> listenersType;
 class Application : public Disposable {
@@ -63,6 +61,5 @@ class ApplicationCore : public ApplicationListener {
   void pause() override;
   void resume() override;
   void dispose() override;
-  void fileDropped(std::filesystem::path path) override;
 };
 }  // namespace nova

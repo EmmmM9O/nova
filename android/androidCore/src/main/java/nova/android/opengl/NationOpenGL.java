@@ -1,11 +1,17 @@
 package nova.android.opengl;
 
 import android.view.Surface;
+import android.util.Log;
 
 public class NationOpenGL {
 
     static {
-        System.loadLibrary("native-lib");
+        Log.i("nova", "loadLibrary");
+        try {
+            System.loadLibrary("native-lib");
+        } catch (Exception e) {
+            Log.e("nova", "loadLibrary error" + e.toString());
+        }
     }
 
     public native void nativeSurfaceCreate(Surface surface);

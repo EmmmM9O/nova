@@ -11,7 +11,7 @@
 
 #include "core/function.hpp"
 namespace nova {
-enum class TaskState { undefined, waiting, running, finish ,error};
+enum class TaskState { undefined, waiting, running, finish, error };
 class Task {
  public:
   Runnable func;
@@ -26,13 +26,15 @@ struct TaskPriorityCmp {
     return t1.taskPriority > t2.taskPriority;
   }
 };
-typedef std::function<void(size_t,std::runtime_error)> threadPoolErrorHandler;
+typedef std::function<void(size_t, std::runtime_error)> threadPoolErrorHandler;
 typedef std::priority_queue<Task, std::vector<Task>, TaskPriorityCmp> Tasks;
 typedef std::vector<std::thread*> ThreadsVec;
 class ThreadPool {
- private:
+ public:
   ThreadPool(const ThreadPool&);
   ThreadPool& operator=(const ThreadPool&);
+
+ private:
   Tasks tasks;
   ThreadsVec threads;
   void threadLoop(size_t my_id);
@@ -40,22 +42,23 @@ class ThreadPool {
   std::mutex mutex;
   bool running;
   void newThread();
-    threadPoolErrorHandler handler;
+  threadPoolErrorHandler handler;
+
  public:
   size_t maxSize = 10;
   ThreadPool(size_t size);
-  ThreadPool(size_t size,threadPoolErrorHandler handler);
+  ThreadPool(size_t size, threadPoolErrorHandler handler);
   ~ThreadPool();
   void start();
   void stop();
   void addTask(Task&);
   void addTask(Runnable);
   bool isBlocking();
-    void setErrorHandler(threadPoolErrorHandler handler);
+  void setErrorHandler(threadPoolErrorHandler handler);
 };
-class Threads{
-public:
-    static ThreadPool threadPool;
-    static void daemon(Runnable runnable);
+class Threads {
+ public:
+  static ThreadPool threadPool;
+  static void daemon(Runnable runnable);
 };
 }  // namespace nova

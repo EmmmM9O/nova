@@ -1,0 +1,4 @@
+[submodule "android/fmt"]
+	path = android/fmt
+	url = https://github.com/fmtlib/fmt.git
+	exclude = .github,doc,test

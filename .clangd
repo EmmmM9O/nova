@@ -1,29 +1,10 @@
 CompileFlags:
-  Add: [-std=c++2a,-I/home/novarc/nova,-Wall]
+  Add: [-stdlib=libc++,-std=c++2b,-I/home/novarc/nova,-Wall,-nostdinc++,-I/home/novarc/ndk/android-ndk-r24/toolchains/llvm/prebuilt/linux-aarch64/sysroot/usr/include/,-I/home/novarc/ndk/android-ndk-r24/toolchains/llvm/prebuilt/linux-aarch64/sysroot/usr/include/c++/v1/,-D__ANDROID__,-I/home/novarc/nova/android/androidCore/include]
   Compiler: clang++
 Diagnostics:
   UnusedIncludes: Strict
-    #ClangTidy:
-    # Add: []
-    #  Remove:
-    #   [
-    #    abseil*,
-    #     fuchsia*,
-    #    lvmlib*,
-        #    zircon*,
-        #    altera*,
-        #    google-readability-todo,
-        #    readability-braces-around-statements,
-        #    #    hicpp-braces-around-statements,
-        #    modernize-use-trailing-return-type,
-        #   ]
-        # CheckOptions:
-        #  readability-identifier-naming.VariableCase: CamelCase
 InlayHints:
   Designators: Yes
   Enabled: Yes
   ParameterNames: Yes
   DeducedTypes: Yes
-  BlockEnd: Yes
-If:
-  PathMatch: ./**.hpp  

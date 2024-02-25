@@ -9,7 +9,6 @@
 #include <ostream>
 #include <string>
 namespace nova {
-void logger::init(std::filesystem::path logDir) {}
 
 std::string logger::formatOutput(const std::source_location& location,
                                  const LogLevel& level, std::string text) {

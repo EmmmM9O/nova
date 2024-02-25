@@ -48,7 +48,5 @@ void ApplicationCore::resume() {
 void ApplicationCore::update() {
   for (auto l : modules) l->update();
 }
-void ApplicationCore::fileDropped(std::filesystem::path path) {
-  for (auto l : modules) l->fileDropped(path);
-}
+
 }  // namespace nova
