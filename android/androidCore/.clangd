@@ -1,5 +1,5 @@
 CompileFlags:
-  Add: [-std=c++2a,-I/home/novarc/nova/android,-Wall,-stdlib=libc++,-I/home/novarc/nova/android/src/include,-I/home/novarc/nova]
+  Add: [-stdlib=libc++,-std=c++20,-I/root/nova,-Wall,-nostdinc++,-I/root/ndk/android-ndk-r24/toolchains/llvm/prebuilt/linux-aarch64/sysroot/usr/include/,-I/root/ndk/android-ndk-r24/toolchains/llvm/prebuilt/linux-aarch64/sysroot/usr/include/c++/v1/,-D__ANDROID__,-I/root/nova/android/androidCore/include]
   Compiler: clang++
 Diagnostics:
   UnusedIncludes: Strict
@@ -8,6 +8,3 @@ InlayHints:
   Enabled: Yes
   ParameterNames: Yes
   DeducedTypes: Yes
-  BlockEnd: Yes
-If:
-  PathMatch: ./**.hpp  

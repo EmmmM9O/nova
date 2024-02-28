@@ -1,7 +1,7 @@
 add_rules("plugin.compile_commands.autoupdate", { outputdir = ".vscode" })
 add_rules("mode.debug", "mode.release")
 add_requires("glfw", "fmt")
-set_languages("c++2a")
+set_languages("c++20")
 local sys = is_os("windows") and "windows" or is_os("linux") and "linux" 
 task("format")
 set_category("plugin")

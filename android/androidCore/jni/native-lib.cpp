@@ -1,7 +1,5 @@
 #include <jni.h>
 
-#include <string>
-
 #include "GLES3/gl3.h"
 #include "android/log.h"
 #include "android/native_window.h"
