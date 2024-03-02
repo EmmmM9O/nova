@@ -55,3 +55,4 @@ obj/
 src/nova/android/R.java
 src/main/java/nova/android/R.java
 nova.keystore
+.clangd
