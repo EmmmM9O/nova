@@ -1,6 +1,5 @@
 #include "core/OS.hpp"
 
-#include <cstdlib>
 #include <string>
 
 #include "core/Threads.hpp"

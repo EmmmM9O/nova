@@ -1,6 +1,7 @@
 #include "application.hpp"
 
 #include <algorithm>
+#include <filesystem>
 #include <iterator>
 #include <memory>
 #include <mutex>
@@ -31,22 +32,31 @@ void ApplicationCore::add(std::shared_ptr<ApplicationListener> listener) {
 }
 void ApplicationCore::init() {
   setup();
-  for (auto l : modules) l->init();
+  for (auto l : modules)
+    l->init();
 }
 void ApplicationCore::resize(int w, int h) {
-  for (auto l : modules) l->resize(w, h);
+  for (auto l : modules)
+    l->resize(w, h);
 }
 void ApplicationCore::dispose() {
-  for (auto l : modules) l->dispose();
+  for (auto l : modules)
+    l->dispose();
 }
 void ApplicationCore::pause() {
-  for (auto l : modules) l->pause();
+  for (auto l : modules)
+    l->pause();
 }
 void ApplicationCore::resume() {
-  for (auto l : modules) l->resume();
+  for (auto l : modules)
+    l->resume();
 }
 void ApplicationCore::update() {
-  for (auto l : modules) l->update();
+  for (auto l : modules)
+    l->update();
 }
-
-}  // namespace nova
+void ApplicationCore::fileDropped(std::filesystem::path file) {
+  for (auto l : modules)
+    l->fileDropped(file);
+}
+} // namespace nova

@@ -1,4 +1,5 @@
 #pragma once
+#include <filesystem>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -9,11 +10,11 @@ namespace nova {
 enum class systemType { Android, Linux, Window, Undefined };
 enum class runType { Desktop, Headless };
 class Disposable {
- public:
+public:
   virtual void dispose() = 0;
 };
 class ApplicationListener {
- public:
+public:
   virtual void init() = 0;
   virtual void resize(int width, int height) = 0;
   virtual void update() = 0;
@@ -21,14 +22,15 @@ class ApplicationListener {
   virtual void resume() = 0;
   virtual void dispose() = 0;
   virtual void exit() = 0;
+  virtual void fileDropped(std::filesystem::path file) = 0;
 };
 typedef std::vector<std::shared_ptr<ApplicationListener>> listenersType;
 class Application : public Disposable {
- protected:
+protected:
   static std::mutex mt;
 
- public:
-  virtual listenersType& getListeners() = 0;
+public:
+  virtual listenersType &getListeners() = 0;
   virtual void addListener(std::shared_ptr<ApplicationListener> listener);
   virtual void removeListener(std::shared_ptr<ApplicationListener> listener);
   virtual void defaultUpdate();
@@ -49,10 +51,10 @@ class Application : public Disposable {
   virtual void exit() = 0;
 };
 class ApplicationCore : public ApplicationListener {
- protected:
+protected:
   listenersType modules;
 
- public:
+public:
   void add(std::shared_ptr<ApplicationListener> module);
   virtual void setup() = 0;
   void init() override;
@@ -61,5 +63,6 @@ class ApplicationCore : public ApplicationListener {
   void pause() override;
   void resume() override;
   void dispose() override;
+  void fileDropped(std::filesystem::path file) override;
 };
-}  // namespace nova
+} // namespace nova

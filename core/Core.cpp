@@ -4,5 +4,7 @@
 
 #include "core/application.hpp"
 namespace nova {
-std::shared_ptr<Application> Core::app = nullptr;
+namespace Core {
+std::shared_ptr<Application> app = nullptr;
 }
+} // namespace nova
