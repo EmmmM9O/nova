@@ -6,7 +6,8 @@
 #include "android/native_window_jni.h"
 #include "egl/EglThread.h"
 #include "nova_android_opengl_NationOpenGL.h"
-
+#include <filesystem>
+std::filesystem::path test;
 void callBackOnCreate() { LOGE("callBackOnCreate"); }
 
 void callBackOnChange(int width, int height) {

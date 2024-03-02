@@ -40,4 +40,4 @@ build/
 *.apk
 *.jks
 *.keystore
-
+temp/
