@@ -22,6 +22,8 @@ void callBackOnDraw() {
   glClear(GL_COLOR_BUFFER_BIT);
   LOGE("callBackOnDraw");
 }
+AndroidApplication::AndroidApplication(){
+}
 runType AndroidApplication::getType() { return runType::Desktop; }
 systemType AndroidApplication::getSystem() { return systemType::Android; }
 void AndroidApplication::initialize(
