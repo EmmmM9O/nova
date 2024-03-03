@@ -10,11 +10,11 @@ namespace nova {
 enum class systemType { Android, Linux, Window, Undefined };
 enum class runType { Desktop, Headless };
 class Disposable {
-public:
+ public:
   virtual void dispose() = 0;
 };
 class ApplicationListener {
-public:
+ public:
   virtual void init() = 0;
   virtual void resize(int width, int height) = 0;
   virtual void update() = 0;
@@ -26,10 +26,10 @@ public:
 };
 typedef std::vector<std::shared_ptr<ApplicationListener>> listenersType;
 class Application : public Disposable {
-protected:
+ protected:
   static std::mutex mt;
 
-public:
+ public:
   virtual listenersType &getListeners() = 0;
   virtual void addListener(std::shared_ptr<ApplicationListener> listener);
   virtual void removeListener(std::shared_ptr<ApplicationListener> listener);
@@ -42,6 +42,8 @@ public:
   virtual bool isLinux();
   virtual bool isAndroid();
   virtual int getVersion();
+  virtual long getNativeHeap();
+  virtual long getJavaHeap();
   virtual std::string getClipboardText() = 0;
   virtual void post(Runnable runnable) = 0;
   virtual void setClipboardText(std::string text) = 0;
@@ -51,10 +53,10 @@ public:
   virtual void exit() = 0;
 };
 class ApplicationCore : public ApplicationListener {
-protected:
+ protected:
   listenersType modules;
 
-public:
+ public:
   void add(std::shared_ptr<ApplicationListener> module);
   virtual void setup() = 0;
   void init() override;
@@ -65,4 +67,4 @@ public:
   void dispose() override;
   void fileDropped(std::filesystem::path file) override;
 };
-} // namespace nova
+}  // namespace nova

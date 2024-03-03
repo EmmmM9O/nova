@@ -4,9 +4,9 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
-    private NationOpenGL mNationOpenGL;
+import nova.android.NativeAndroidApplication;
 
+public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
     public GLSurfaceView(Context context) {
         this(context, null);
     }
@@ -17,22 +17,21 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     public GLSurfaceView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mNationOpenGL = new NationOpenGL();
         getHolder().addCallback(this);
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        mNationOpenGL.nativeSurfaceCreate(holder.getSurface());
+        NativeAndroidApplication.androidApplication.nativeSurfaceCreate(holder.getSurface(), this);
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
-        mNationOpenGL.nativeSurfaceChanged(width, height);
+        NativeAndroidApplication.androidApplication.nativeSurfaceChanged(width, height, this);
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        mNationOpenGL.nativeSurfaceDestroyed();
+        NativeAndroidApplication.androidApplication.nativeSurfaceDestroyed(this);
     }
 }

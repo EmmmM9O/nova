@@ -7,7 +7,9 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -16,9 +18,8 @@ import java.lang.Thread.*;
 public class AndroidApplication extends Activity {
     protected ClipboardManager clipboard;
 
-    protected native void initJNI();
-
     protected void init() {
+        NativeAndroidApplication.init();
         UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler((thread, error) -> {
             if (handler != null) {
@@ -29,7 +30,7 @@ public class AndroidApplication extends Activity {
             }
         });
         this.clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        initJNI();
+        NativeAndroidApplication.androidApplication.initJNI(this);
     }
 
     @Override
@@ -78,6 +79,28 @@ public class AndroidApplication extends Activity {
         if (text == null)
             return null;
         return text.toString();
+    }
 
+    public int getVersion() {
+        return android.os.Build.VERSION.SDK_INT;
+    }
+
+    public long getNativeHeap() {
+        return Debug.getNativeHeapAllocatedSize();
+    }
+
+    public void exit() {
+        if (Build.VERSION.SDK_INT < 21) {
+            this.finish();
+        } else {
+            this.finishAndRemoveTask();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        NativeAndroidApplication.androidApplication.onDestory(this);
+        super.onDestroy();
+        System.exit(0);
     }
 }
