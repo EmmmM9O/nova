@@ -1,8 +1,6 @@
 #include <jni.h>
 
-#include <filesystem>
 #include <memory>
-
 #include "AndroidApplication.hpp"
 #include "nova_android_NativeAndroidApplication.h"
 std::shared_ptr<nova::AndroidApplication> app(new nova::AndroidApplication());
@@ -12,6 +10,7 @@ Java_nova_android_NativeAndroidApplication_nativeSurfaceCreate(JNIEnv *env,
                                                                jobject surface,
                                                                jobject view) {
   app->createSurcafe(env, view, surface);
+    
 }
 /*
  * Class:     nova_android_NativeAndroidApplication

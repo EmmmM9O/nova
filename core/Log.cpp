@@ -9,7 +9,6 @@
 #include <ostream>
 #include <string>
 namespace nova {
-
 std::string logger::formatOutput(const std::source_location& location,
                                  const LogLevel& level, std::string text) {
   return fmt::format(fmt::runtime(formatStyle), fmt::arg("level", level),

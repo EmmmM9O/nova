@@ -22,8 +22,7 @@ void callBackOnDraw() {
   glClear(GL_COLOR_BUFFER_BIT);
   LOGE("callBackOnDraw");
 }
-AndroidApplication::AndroidApplication(){
-}
+AndroidApplication::AndroidApplication() {}
 runType AndroidApplication::getType() { return runType::Desktop; }
 systemType AndroidApplication::getSystem() { return systemType::Android; }
 void AndroidApplication::initialize(
@@ -71,7 +70,9 @@ int AndroidApplication::getVersion() {
     LOGE("fail to find method getVersion");
     return 0;
   }
-  return env->CallIntMethod(coreActivity, javaMethod);
+  int res = env->CallIntMethod(coreActivity, javaMethod);
+  javaVM->DetachCurrentThread();
+  return res;
 }
 long AndroidApplication::getNativeHeap() {
   JNIEnv *env;
@@ -86,7 +87,9 @@ long AndroidApplication::getNativeHeap() {
     LOGE("fail to find method getNativeHeap");
     return 0;
   }
-  return env->CallLongMethod(coreActivity, javaMethod);
+  long res = env->CallLongMethod(coreActivity, javaMethod);
+  javaVM->DetachCurrentThread();
+  return res;
 }
 void AndroidApplication::setClipboardText(std::string text) {
   JNIEnv *env;
@@ -104,6 +107,7 @@ void AndroidApplication::setClipboardText(std::string text) {
   }
   env->CallVoidMethod(coreActivity, javaMethod,
                       env->NewStringUTF(text.c_str()));
+  javaVM->DetachCurrentThread();
 }
 std::string AndroidApplication::getClipboardText() {
   JNIEnv *env;
@@ -124,6 +128,7 @@ std::string AndroidApplication::getClipboardText() {
   std::string str = "";
   str += tmp;
   env->ReleaseStringUTFChars(jstr, tmp);
+  javaVM->DetachCurrentThread();
   return str;
 }
 bool AndroidApplication::openURI(std::string uri) {
@@ -140,8 +145,10 @@ bool AndroidApplication::openURI(std::string uri) {
     LOGE("fail to find method openURI");
     return false;
   }
-  return env->CallBooleanMethod(coreActivity, javaMethod,
-                                env->NewStringUTF(uri.c_str()));
+  bool res = env->CallBooleanMethod(coreActivity, javaMethod,
+                                    env->NewStringUTF(uri.c_str()));
+  javaVM->DetachCurrentThread();
+  return res;
 }
 bool AndroidApplication::openFolder(std::string path) {
   JNIEnv *env;
@@ -157,8 +164,10 @@ bool AndroidApplication::openFolder(std::string path) {
     LOGE("fail to find method openFolder");
     return false;
   }
-  return env->CallBooleanMethod(coreActivity, javaMethod,
-                                env->NewStringUTF(path.c_str()));
+  bool res = env->CallBooleanMethod(coreActivity, javaMethod,
+                                    env->NewStringUTF(path.c_str()));
+  javaVM->DetachCurrentThread();
+  return res;
 }
 void AndroidApplication::onDestroy(JNIEnv *env, jobject activity) {
   javaVM->DestroyJavaVM();
@@ -194,4 +203,4 @@ void AndroidApplication::post(Runnable runnable) {
   Threads::threadPool.addTask(runnable);
 }
 listenersType &AndroidApplication::getListeners() { return listeners; }
-}  // namespace nova
+} // namespace nova
