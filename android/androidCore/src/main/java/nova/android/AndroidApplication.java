@@ -1,5 +1,7 @@
 package nova.android;
 
+import java.io.File;
+
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
@@ -10,27 +12,16 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
-import android.util.Log;
 import android.widget.Toast;
-
-import java.lang.Thread.*;
 
 public class AndroidApplication extends Activity {
     protected ClipboardManager clipboard;
+    protected CrashHandler crashHandler;
 
     protected void init() {
-        NativeAndroidApplication.init();
-        UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
-        Thread.setDefaultUncaughtExceptionHandler((thread, error) -> {
-            if (handler != null) {
-                handler.uncaughtException(thread, error);
-            } else {
-                Log.e("nova", error.toString());
-                System.exit(1);
-            }
-        });
+        //crashHandler = new CrashHandler(new File(getFilesDir(), "crash"));
         this.clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        NativeAndroidApplication.androidApplication.initJNI(this);
+        NativeAndroidApplication.initJNI(this);
     }
 
     @Override
@@ -40,7 +31,11 @@ public class AndroidApplication extends Activity {
         setContentView(R.layout.activity_main);
     }
 
-    boolean openURI(String uri) {
+    public String getFilesDirString() {
+        return getFilesDir().getAbsolutePath();
+    }
+
+    public boolean openURI(String uri) {
         try {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
             return true;
@@ -99,7 +94,7 @@ public class AndroidApplication extends Activity {
 
     @Override
     protected void onDestroy() {
-        NativeAndroidApplication.androidApplication.onDestory(this);
+        NativeAndroidApplication.onDestory(this);
         super.onDestroy();
         System.exit(0);
     }

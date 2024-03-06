@@ -14,19 +14,15 @@ public class NativeAndroidApplication {
             Log.e("nova", "loadLibrary error" + e.toString());
         }
     }
-    public static NativeAndroidApplication androidApplication;
 
-    public static void init() {
-        androidApplication = new NativeAndroidApplication();
-    }
 
-    public native void nativeSurfaceCreate(Surface surface, GLSurfaceView thiz);
+    public static native void nativeSurfaceCreate(Surface surface, GLSurfaceView thiz);
 
-    public native void nativeSurfaceChanged(int width, int height, GLSurfaceView thiz);
+    public static native void nativeSurfaceChanged(int width, int height, GLSurfaceView thiz);
 
-    public native void nativeSurfaceDestroyed(GLSurfaceView thiz);
+    public static native void nativeSurfaceDestroyed(GLSurfaceView thiz);
 
-    public native void initJNI(AndroidApplication thiz);
+    public static native void initJNI(AndroidApplication thiz);
 
-    public native void onDestory(AndroidApplication thiz);
+    public static native void onDestory(AndroidApplication thiz);
 }

@@ -22,16 +22,16 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        NativeAndroidApplication.androidApplication.nativeSurfaceCreate(holder.getSurface(), this);
+        NativeAndroidApplication.nativeSurfaceCreate(holder.getSurface(), this);
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
-        NativeAndroidApplication.androidApplication.nativeSurfaceChanged(width, height, this);
+        NativeAndroidApplication.nativeSurfaceChanged(width, height, this);
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        NativeAndroidApplication.androidApplication.nativeSurfaceDestroyed(this);
+        NativeAndroidApplication.nativeSurfaceDestroyed(this);
     }
 }

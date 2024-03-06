@@ -1,5 +1,8 @@
 #pragma once
+#include <cstdint>
+#include <filesystem>
 #include <memory>
+#include <string>
 
 #include "android/androidCore/jni/egl/EglThread.h"
 #include "core/application.hpp"
@@ -9,8 +12,9 @@ struct AndroidApplicationConfiguration {};
 class AndroidApplication : public Application {
  protected:
   listenersType listeners;
-
+    std::filesystem::path filesDir;
  public:
+
   std::shared_ptr<EglThread> eglThread = NULL;
   JavaVM *javaVM;
   jobject coreActivity, coreView;
@@ -23,7 +27,7 @@ class AndroidApplication : public Application {
   void onDestroy(JNIEnv *env, jobject activity);
   runType getType() override;
   systemType getSystem() override;
-  int getVersion() override;
+  int32_t getVersion() override;
   long getNativeHeap() override;
   void setClipboardText(std::string text) override;
   std::string getClipboardText() override;
@@ -35,5 +39,7 @@ class AndroidApplication : public Application {
   void exit() override;
   void post(Runnable runnable) override;
   listenersType &getListeners() override;
+    std::filesystem::path getFilesDir();
+    std::string getFilesDirJava();
 };
 }  // namespace nova

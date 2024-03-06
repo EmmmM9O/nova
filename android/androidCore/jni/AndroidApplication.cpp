@@ -1,14 +1,15 @@
 #include "AndroidApplication.hpp"
 
-#include <memory>
-#include <string>
-
 #include "android/androidCore/jni/egl/EglThread.h"
 #include "android/native_window_jni.h"
+#include "core/Log.hpp"
 #include "core/Threads.hpp"
 #include "core/application.hpp"
 #include "jni.h"
 #include "log/JniLog.h"
+#include <filesystem>
+#include <memory>
+#include <string>
 namespace nova {
 void callBackOnCreate() { LOGE("callBackOnCreate"); }
 
@@ -31,6 +32,8 @@ void AndroidApplication::initialize(
     AndroidApplicationConfiguration config) {
   env->GetJavaVM(&javaVM);
   coreActivity = env->NewGlobalRef(activity);
+//  filesDir = std::filesystem::path(getFilesDirJava());
+//  Log::my_logger.logDir = filesDir / "logs";
   addListener(listener);
 }
 void AndroidApplication::createSurcafe(JNIEnv *env, jobject view,
@@ -57,7 +60,7 @@ void AndroidApplication::surfaceDestory(JNIEnv *env, jobject instance) {
     pthread_join(eglThread->mEglThread, NULL);
   }
 }
-int AndroidApplication::getVersion() {
+int32_t AndroidApplication::getVersion() {
   JNIEnv *env;
   javaVM->AttachCurrentThreadAsDaemon(&env, nullptr);
   jclass javaClass = env->GetObjectClass(coreActivity);
@@ -197,10 +200,34 @@ void AndroidApplication::exit() {
     return;
   }
   env->CallVoidMethod(coreActivity, javaMethod);
+  javaVM->DetachCurrentThread();
 }
 
 void AndroidApplication::post(Runnable runnable) {
   Threads::threadPool.addTask(runnable);
 }
 listenersType &AndroidApplication::getListeners() { return listeners; }
+std::filesystem::path AndroidApplication::getFilesDir() { return filesDir; }
+std::string AndroidApplication::getFilesDirJava() {
+  JNIEnv *env;
+  javaVM->AttachCurrentThreadAsDaemon(&env, nullptr);
+  jclass javaClass = env->GetObjectClass(coreActivity);
+  if (javaClass == nullptr) {
+    LOGE("fail to find activity class");
+    return "";
+  }
+  jmethodID javaMethod =
+      env->GetMethodID(javaClass, "getFilesDirString", "()Ljava/lang/String;");
+  if (javaMethod == nullptr) {
+    LOGE("fail to find method getFilesDirString");
+    return "";
+  }
+  jstring jstr = (jstring)env->CallObjectMethod(coreActivity, javaMethod);
+  const char *tmp = env->GetStringUTFChars(jstr, nullptr);
+  std::string str = "";
+  str += tmp;
+  env->ReleaseStringUTFChars(jstr, tmp);
+  javaVM->DetachCurrentThread();
+  return str;
+}
 } // namespace nova

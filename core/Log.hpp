@@ -1,5 +1,7 @@
 #pragma once
+#include <filesystem>
 #include <fmt/core.h>
+#include <memory>
 #include <source_location>
 #include <string>
 #include <string_view>
@@ -13,18 +15,23 @@ enum class LogLevel {
 };
 
 class logger {
+
 public:
   std::time_t time = std::time(nullptr);
   const bool useColors = true;
-  std::string_view formatStyle =
-      "[{level}][{time:%H:%M:%S %Y-%m-%d}][File:[{file}] Func:[{function}] "
-      "Line:[{line}]]\n>{context}";
+  std::string_view formatTime = "[{time:%H:%M:%S %Y-%m-%d}]{context}";
+  std::string_view formatStyle = "[{level}][File:[{file}] Func:[{function}] "
+                                 "Line:[{line}]]\n>{context}";
+  std::filesystem::path logDir;
+  std::string_view fileFormat = "log-{time:%Y-%m-%d}.log";
+
   template <typename... Args>
   std::string format(fmt::format_string<Args...> str, Args &&...args) {
     return fmt::vformat(str, fmt::make_format_args(args...));
   }
   std::string formatOutput(const std::source_location &location,
                            const LogLevel &level, std::string text);
+  std::string timeFormat(std::string str);
   void log(const std::source_location &location, const LogLevel &level,
            std::string text);
   template <typename... Args>
@@ -32,9 +39,10 @@ public:
            fmt::format_string<Args...> str, Args &&...args) {
     log(location, level, format(str, args...));
   }
-    //to build in different
-    void printCosnole(std::string str,LogLevel level);
-    void writeConsole(std::string str,LogLevel level);
+  std::string getFormatFle(LogLevel level);
+  void writeFile(std::string str, LogLevel level);
+  // to build in different
+  void printCosnole(std::string str, LogLevel level);
 };
 class Log {
 public:
