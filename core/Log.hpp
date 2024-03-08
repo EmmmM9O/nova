@@ -32,12 +32,12 @@ public:
   std::string formatOutput(const std::source_location &location,
                            const LogLevel &level, std::string text);
   std::string timeFormat(std::string str);
-  void log(const std::source_location &location, const LogLevel &level,
+  void _log(const std::source_location &location, const LogLevel &level,
            std::string text);
   template <typename... Args>
   void log(const std::source_location &location, const LogLevel &level,
            fmt::format_string<Args...> str, Args &&...args) {
-    log(location, level, format(str, args...));
+    _log(location, level, fmt::vformat(str, fmt::make_format_args(args...)));
   }
   std::string getFormatFle(LogLevel level);
   void writeFile(std::string str, LogLevel level);
@@ -50,7 +50,7 @@ public:
   template <typename... Args>
   static void log(const std::source_location &location, const LogLevel &level,
                   fmt::format_string<Args...> str, Args &&...args) {
-    my_logger.log(location, level, format(str, args...));
+    my_logger.log(location, level,str, args...);
   }
   template <typename... Args>
   static void info(const std::source_location &location,

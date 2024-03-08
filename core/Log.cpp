@@ -26,7 +26,7 @@ std::string logger::getFormatFle(LogLevel level) {
   return fmt::format(fmt::runtime(fileFormat), fmt::arg("level", level),
                      fmt::arg("time", fmt::localtime(time)));
 }
-void logger::log(const std::source_location &location, const LogLevel &level,
+void logger::_log(const std::source_location &location, const LogLevel &level,
                  std::string text) {
   auto str = formatOutput(location, level, text);
 #ifdef __ANDROID__

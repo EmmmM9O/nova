@@ -10,18 +10,18 @@
 #include <filesystem>
 #include <memory>
 #include <string>
+#undef LOGE
+#define LOGE(str) Log_error("{}",str)
 namespace nova {
-void callBackOnCreate() { LOGE("callBackOnCreate"); }
+void callBackOnCreate() { }
 
 void callBackOnChange(int width, int height) {
   glViewport(0, 0, width, height);
-  LOGE("callBackOnChange");
 }
 
 void callBackOnDraw() {
   glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
-  LOGE("callBackOnDraw");
 }
 AndroidApplication::AndroidApplication() {}
 runType AndroidApplication::getType() { return runType::Desktop; }
@@ -32,8 +32,8 @@ void AndroidApplication::initialize(
     AndroidApplicationConfiguration config) {
   env->GetJavaVM(&javaVM);
   coreActivity = env->NewGlobalRef(activity);
-//  filesDir = std::filesystem::path(getFilesDirJava());
-//  Log::my_logger.logDir = filesDir / "logs";
+  filesDir = std::filesystem::path(getFilesDirJava());
+  Log::my_logger.logDir = filesDir / "logs";
   addListener(listener);
 }
 void AndroidApplication::createSurcafe(JNIEnv *env, jobject view,

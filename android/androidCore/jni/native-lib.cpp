@@ -1,16 +1,17 @@
 #include <jni.h>
 
-#include <memory>
 #include "AndroidApplication.hpp"
+#include "core/Log.hpp"
 #include "nova_android_NativeAndroidApplication.h"
+#include "source_location"
+#include <memory>
 std::shared_ptr<nova::AndroidApplication> app(new nova::AndroidApplication());
 JNIEXPORT void JNICALL
 Java_nova_android_NativeAndroidApplication_nativeSurfaceCreate(JNIEnv *env,
-                                                               jobject,
+                                                               jclass,
                                                                jobject surface,
                                                                jobject view) {
   app->createSurcafe(env, view, surface);
-    
 }
 /*
  * Class:     nova_android_NativeAndroidApplication
@@ -19,7 +20,7 @@ Java_nova_android_NativeAndroidApplication_nativeSurfaceCreate(JNIEnv *env,
  */
 JNIEXPORT void JNICALL
 Java_nova_android_NativeAndroidApplication_nativeSurfaceChanged(
-    JNIEnv *env, jobject, jint width, jint height, jobject view) {
+    JNIEnv *env, jclass, jint width, jint height, jobject view) {
   app->surfaceChange(env, view, width, height);
 }
 
@@ -30,7 +31,7 @@ Java_nova_android_NativeAndroidApplication_nativeSurfaceChanged(
  */
 JNIEXPORT void JNICALL
 Java_nova_android_NativeAndroidApplication_nativeSurfaceDestroyed(
-    JNIEnv *env, jobject, jobject view) {
+    JNIEnv *env, jclass, jobject view) {
   app->surfaceDestory(env, view);
 }
 
@@ -40,11 +41,13 @@ Java_nova_android_NativeAndroidApplication_nativeSurfaceDestroyed(
  * Signature: (Lnova/android/AndroidApplication;)V
  */
 JNIEXPORT void JNICALL Java_nova_android_NativeAndroidApplication_initJNI(
-    JNIEnv *env, jobject, jobject activity) {
+    JNIEnv *env, jclass, jobject activity) {
   app->initialize(env, activity, nullptr, {});
-  LOGD("version :%d", app->getVersion());
+  nova::Log::my_logger.log(std::source_location::current(),
+                           nova::LogLevel::Info, "sdk version {}",
+                           app->getVersion());
 }
 JNIEXPORT void JNICALL Java_nova_android_NativeAndroidApplication_onDestory(
-    JNIEnv *env, jobject, jobject activity) {
+    JNIEnv *env, jclass, jobject activity) {
   app->onDestroy(env, activity);
 }

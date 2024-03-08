@@ -19,15 +19,15 @@ public class AndroidApplication extends Activity {
     protected CrashHandler crashHandler;
 
     protected void init() {
-        //crashHandler = new CrashHandler(new File(getFilesDir(), "crash"));
+        crashHandler = new CrashHandler(new File(getFilesDir(), "crash"));
         this.clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         NativeAndroidApplication.initJNI(this);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        init();
         super.onCreate(savedInstanceState);
+        init();
         setContentView(R.layout.activity_main);
     }
 

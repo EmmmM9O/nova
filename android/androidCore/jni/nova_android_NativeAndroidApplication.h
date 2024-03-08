@@ -13,7 +13,7 @@ extern "C" {
  * Signature: (Landroid/view/Surface;Lnova/android/opengl/GLSurfaceView;)V
  */
 JNIEXPORT void JNICALL Java_nova_android_NativeAndroidApplication_nativeSurfaceCreate
-  (JNIEnv *, jobject, jobject, jobject);
+  (JNIEnv *, jclass, jobject, jobject);
 
 /*
  * Class:     nova_android_NativeAndroidApplication
@@ -21,7 +21,7 @@ JNIEXPORT void JNICALL Java_nova_android_NativeAndroidApplication_nativeSurfaceC
  * Signature: (IILnova/android/opengl/GLSurfaceView;)V
  */
 JNIEXPORT void JNICALL Java_nova_android_NativeAndroidApplication_nativeSurfaceChanged
-  (JNIEnv *, jobject, jint, jint, jobject);
+  (JNIEnv *, jclass, jint, jint, jobject);
 
 /*
  * Class:     nova_android_NativeAndroidApplication
@@ -29,7 +29,7 @@ JNIEXPORT void JNICALL Java_nova_android_NativeAndroidApplication_nativeSurfaceC
  * Signature: (Lnova/android/opengl/GLSurfaceView;)V
  */
 JNIEXPORT void JNICALL Java_nova_android_NativeAndroidApplication_nativeSurfaceDestroyed
-  (JNIEnv *, jobject, jobject);
+  (JNIEnv *, jclass, jobject);
 
 /*
  * Class:     nova_android_NativeAndroidApplication
@@ -37,7 +37,7 @@ JNIEXPORT void JNICALL Java_nova_android_NativeAndroidApplication_nativeSurfaceD
  * Signature: (Lnova/android/AndroidApplication;)V
  */
 JNIEXPORT void JNICALL Java_nova_android_NativeAndroidApplication_initJNI
-  (JNIEnv *, jobject, jobject);
+  (JNIEnv *, jclass, jobject);
 
 /*
  * Class:     nova_android_NativeAndroidApplication
@@ -45,7 +45,7 @@ JNIEXPORT void JNICALL Java_nova_android_NativeAndroidApplication_initJNI
  * Signature: (Lnova/android/AndroidApplication;)V
  */
 JNIEXPORT void JNICALL Java_nova_android_NativeAndroidApplication_onDestory
-  (JNIEnv *, jobject, jobject);
+  (JNIEnv *, jclass, jobject);
 
 #ifdef __cplusplus
 }
