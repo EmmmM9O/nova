@@ -102,7 +102,7 @@ void AndroidApplication::setClipboardText(std::string text) {
     return;
   }
   jmethodID javaMethod =
-      env->GetMethodID(javaClass, "setClipboardText", "(Ljava/lang/String)V");
+      env->GetMethodID(javaClass, "setClipboardText", "(Ljava/lang/String;)V");
   if (javaMethod == nullptr) {
     LOGE("fail to find method setClipboardText");
     return;
@@ -119,7 +119,7 @@ void AndroidApplication::logJava(std::string text) {
     return;
   }
   jmethodID javaMethod =
-      env->GetMethodID(javaClass, "saveInfoToFile", "(Ljava/lang/String)V");
+      env->GetMethodID(javaClass, "saveInfoToFile", "(Ljava/lang/String;)V");
   if (javaMethod == nullptr) {
     LOGE("fail to find method saveInfoToFile");
     return;
