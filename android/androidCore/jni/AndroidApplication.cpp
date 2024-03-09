@@ -10,8 +10,6 @@
 #include <filesystem>
 #include <memory>
 #include <string>
-#undef LOGE
-#define LOGE(str) Log_error("{}",str)
 namespace nova {
 void callBackOnCreate() { }
 
@@ -32,7 +30,10 @@ void AndroidApplication::initialize(
     AndroidApplicationConfiguration config) {
   env->GetJavaVM(&javaVM);
   coreActivity = env->NewGlobalRef(activity);
-  filesDir = std::filesystem::path(getFilesDirJava());
+ //LOGD("%d",getVersion()); 
+    auto str=getFilesDirJava();
+    logJava("jni" + str);
+  filesDir = std::filesystem::path(str);
   Log::my_logger.logDir = filesDir / "logs";
   addListener(listener);
 }
@@ -74,7 +75,6 @@ int32_t AndroidApplication::getVersion() {
     return 0;
   }
   int res = env->CallIntMethod(coreActivity, javaMethod);
-  javaVM->DetachCurrentThread();
   return res;
 }
 long AndroidApplication::getNativeHeap() {
@@ -91,7 +91,6 @@ long AndroidApplication::getNativeHeap() {
     return 0;
   }
   long res = env->CallLongMethod(coreActivity, javaMethod);
-  javaVM->DetachCurrentThread();
   return res;
 }
 void AndroidApplication::setClipboardText(std::string text) {
@@ -110,7 +109,23 @@ void AndroidApplication::setClipboardText(std::string text) {
   }
   env->CallVoidMethod(coreActivity, javaMethod,
                       env->NewStringUTF(text.c_str()));
-  javaVM->DetachCurrentThread();
+}
+void AndroidApplication::logJava(std::string text) {
+  JNIEnv *env;
+  javaVM->AttachCurrentThreadAsDaemon(&env, nullptr);
+  jclass javaClass = env->GetObjectClass(coreActivity);
+  if (javaClass == nullptr) {
+    LOGE("fail to find activity class");
+    return;
+  }
+  jmethodID javaMethod =
+      env->GetMethodID(javaClass, "saveInfoToFile", "(Ljava/lang/String)V");
+  if (javaMethod == nullptr) {
+    LOGE("fail to find method saveInfoToFile");
+    return;
+  }
+  env->CallVoidMethod(coreActivity, javaMethod,
+                      env->NewStringUTF(text.c_str()));
 }
 std::string AndroidApplication::getClipboardText() {
   JNIEnv *env;
@@ -131,7 +146,6 @@ std::string AndroidApplication::getClipboardText() {
   std::string str = "";
   str += tmp;
   env->ReleaseStringUTFChars(jstr, tmp);
-  javaVM->DetachCurrentThread();
   return str;
 }
 bool AndroidApplication::openURI(std::string uri) {
@@ -150,7 +164,6 @@ bool AndroidApplication::openURI(std::string uri) {
   }
   bool res = env->CallBooleanMethod(coreActivity, javaMethod,
                                     env->NewStringUTF(uri.c_str()));
-  javaVM->DetachCurrentThread();
   return res;
 }
 bool AndroidApplication::openFolder(std::string path) {
@@ -169,7 +182,6 @@ bool AndroidApplication::openFolder(std::string path) {
   }
   bool res = env->CallBooleanMethod(coreActivity, javaMethod,
                                     env->NewStringUTF(path.c_str()));
-  javaVM->DetachCurrentThread();
   return res;
 }
 void AndroidApplication::onDestroy(JNIEnv *env, jobject activity) {
@@ -200,7 +212,6 @@ void AndroidApplication::exit() {
     return;
   }
   env->CallVoidMethod(coreActivity, javaMethod);
-  javaVM->DetachCurrentThread();
 }
 
 void AndroidApplication::post(Runnable runnable) {
@@ -224,10 +235,8 @@ std::string AndroidApplication::getFilesDirJava() {
   }
   jstring jstr = (jstring)env->CallObjectMethod(coreActivity, javaMethod);
   const char *tmp = env->GetStringUTFChars(jstr, nullptr);
-  std::string str = "";
-  str += tmp;
+  std::string str = tmp;
   env->ReleaseStringUTFChars(jstr, tmp);
-  javaVM->DetachCurrentThread();
   return str;
 }
 } // namespace nova

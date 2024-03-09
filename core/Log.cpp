@@ -30,7 +30,6 @@ void logger::_log(const std::source_location &location, const LogLevel &level,
                  std::string text) {
   auto str = formatOutput(location, level, text);
 #ifdef __ANDROID__
-
   printCosnole(str, level);
   writeFile(timeFormat(str), level);
 #else
@@ -40,6 +39,7 @@ void logger::_log(const std::source_location &location, const LogLevel &level,
 #endif
 }
 void logger::writeFile(std::string str, LogLevel level) {
+	std::filesystem::create_directory(logDir.string());
   std::filesystem::path logfile = logDir / getFormatFle(level);
   std::ofstream stream(logfile, std::ios::app);
   if (stream.is_open()) {
