@@ -10,11 +10,11 @@
 namespace nova {
 struct AndroidApplicationConfiguration {};
 class AndroidApplication : public Application {
-protected:
+ protected:
   listenersType listeners;
   std::filesystem::path filesDir;
 
-public:
+ public:
   std::shared_ptr<EglThread> eglThread = NULL;
   JavaVM *javaVM;
   jobject coreActivity, coreView;
@@ -41,6 +41,8 @@ public:
   listenersType &getListeners() override;
   std::filesystem::path getFilesDir();
   std::string getFilesDirJava();
-  void logJava(std::string text) ;
+  void logJava(std::string text);
+  int getJavaVersion() override;
+  long getMaxMemory() override;
 };
-} // namespace nova
+}  // namespace nova

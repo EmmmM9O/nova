@@ -1,35 +1,37 @@
-//
-// Created by zeng on 2019/4/22.
-//
+#include "AndroidGraphics.hpp"
 
-#include "EglHelper.h"
-#include <GLES2/gl2.h>
 #include "EGL/egl.h"
-#include "core/Log.hpp"
-
-EglHelper::EglHelper() {
+#include "EGL/eglplatform.h"
+#include "android/native_window_jni.h"
+#include "core/Graphics.hpp"
+#include "core/application.hpp"
+#include "log/JniLog.h"
+namespace nova {
+AndroidGraphics::AndroidGraphics() {
   mEglDisplay = EGL_NO_DISPLAY;
   mEglSurface = EGL_NO_SURFACE;
   mEglContext = EGL_NO_CONTEXT;
 }
-
-EglHelper::~EglHelper() {}
-
-int EglHelper::initEgl(EGLNativeWindowType window) {
+void AndroidGraphics::init(JNIEnv *env, jobject instance, jobject surface) {
+  mANativeWindow = ANativeWindow_fromSurface(env, surface);
   // 1.得到默认的显示设备（就是窗口） -- eglGetDisplay
   mEglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
   if (mEglDisplay == EGL_NO_DISPLAY) {
     LOGE("eglGetDisplay error");
-    return -1;
+    return;
   }
 
   // 2. 初始化默认显示设备 -- eglInitialize
-  EGLint *version = new EGLint[2];
-  if (!eglInitialize(mEglDisplay, &version[0], &version[1])) {
+  EGLint majorVersion, minorVersion;
+  if (!eglInitialize(mEglDisplay, &majorVersion, &minorVersion)) {
     LOGE("eglInitialize error");
-    return -1;
+    return;
   }
-
+  std::string vendorString = eglQueryString(mEglDisplay, EGL_VENDOR);
+  std::string rendererString = eglQueryString(mEglDisplay, EGL_VENDOR);
+  std::string versionString = eglQueryString(mEglDisplay, EGL_VERSION);
+  glVersion = GLVersion(systemType::Android, vendorString, rendererString,
+                        versionString);
   // 3. 设置显示设备的属性
   const EGLint attrib_config_list[] = {EGL_RED_SIZE,
                                        8,
@@ -53,14 +55,14 @@ int EglHelper::initEgl(EGLNativeWindowType window) {
 
   if (!eglChooseConfig(mEglDisplay, attrib_config_list, NULL, 1, &num_config)) {
     LOGE("eglChooseConfig error");
-    return -1;
+    return;
   }
   // 3.2 根据获取到的config_size得到eglConfig
   EGLConfig eglConfig;
   if (!eglChooseConfig(mEglDisplay, attrib_config_list, &eglConfig, num_config,
                        &num_config)) {
     LOGE("eglChooseConfig error");
-    return -1;
+    return;
   }
 
   // 4. 创建egl上下文 eglCreateContext
@@ -68,36 +70,24 @@ int EglHelper::initEgl(EGLNativeWindowType window) {
   mEglContext = eglCreateContext(mEglDisplay, eglConfig, NULL, attrib_ctx_list);
   if (mEglContext == EGL_NO_CONTEXT) {
     LOGE("eglCreateContext  error");
-    return -1;
+    return;
   }
   // 5.创建渲染的surface
-  mEglSurface = eglCreateWindowSurface(mEglDisplay, eglConfig, window, NULL);
+  mEglSurface =
+      eglCreateWindowSurface(mEglDisplay, eglConfig, mANativeWindow, NULL);
   if (mEglSurface == EGL_NO_SURFACE) {
     LOGE("eglCreateWindowSurface  error");
-    return -1;
+    return;
   }
   // 6. 绑定eglContext和surface到display
   if (!eglMakeCurrent(mEglDisplay, mEglSurface, mEglSurface, mEglContext)) {
     LOGE("eglMakeCurrent  error");
-    return -1;
+    return;
   }
 
   // 7. 刷新数据，显示渲染场景 -- eglSwapBuffers
-  nova::Log::my_logger.log(std::source_location::current(),
-                           nova::LogLevel::Info, "EGL version {} GLES {}",
-                           eglQueryString(mEglDisplay, EGL_VERSION),reinterpret_cast<const char*>(glGetString(GL_VERSION)));
-  return 0;
 }
-
-int EglHelper::swapBuffers() {
-  if (mEglDisplay != EGL_NO_DISPLAY && mEglSurface != EGL_NO_SURFACE &&
-      eglSwapBuffers(mEglDisplay, mEglSurface)) {
-    return 0;
-  }
-  return -1;
-}
-
-void EglHelper::destroyEgl() {
+void AndroidGraphics::destory() {
   if (mEglDisplay != EGL_NO_DISPLAY) {
     // 解绑display上的eglContext和surface
     eglMakeCurrent(mEglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
@@ -119,3 +109,5 @@ void EglHelper::destroyEgl() {
     }
   }
 }
+GLVersion AndroidGraphics::getGLVersion() { return glVersion; }
+}  // namespace nova

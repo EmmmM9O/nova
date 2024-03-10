@@ -1,14 +1,30 @@
 #include "Log.hpp"
 
-#include <filesystem>
 #include <fmt/chrono.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
 
+#include <filesystem>
 #include <fstream>
 #include <ios>
 #include <string>
 namespace nova {
+std::string to_string(LogLevel level) {
+  switch (level) {
+    case nova::LogLevel::Info:
+      return "info";
+    case nova::LogLevel::Debug:
+      return "debug";
+    case nova::LogLevel::Error:
+      return "error";
+    case nova::LogLevel::Warn:
+      return "warn";
+    case nova::LogLevel::None:
+      return "none";
+    default:
+      return "NoLevel";
+  }
+}
 std::string logger::formatOutput(const std::source_location &location,
                                  const LogLevel &level, std::string text) {
   return fmt::format(fmt::runtime(formatStyle), fmt::arg("level", level),
@@ -27,7 +43,7 @@ std::string logger::getFormatFle(LogLevel level) {
                      fmt::arg("time", fmt::localtime(time)));
 }
 void logger::_log(const std::source_location &location, const LogLevel &level,
-                 std::string text) {
+                  std::string text) {
   auto str = formatOutput(location, level, text);
 #ifdef __ANDROID__
   printCosnole(str, level);
@@ -39,7 +55,7 @@ void logger::_log(const std::source_location &location, const LogLevel &level,
 #endif
 }
 void logger::writeFile(std::string str, LogLevel level) {
-	std::filesystem::create_directory(logDir.string());
+  std::filesystem::create_directory(logDir.string());
   std::filesystem::path logfile = logDir / getFormatFle(level);
   std::ofstream stream(logfile, std::ios::app);
   if (stream.is_open()) {
@@ -50,26 +66,8 @@ void logger::writeFile(std::string str, LogLevel level) {
   }
 }
 logger Log::my_logger;
-} // namespace nova
+}  // namespace nova
 auto fmt::formatter<nova::LogLevel>::format(nova::LogLevel level,
                                             format_context &ctx) const {
-  string_view name = "none";
-  switch (level) {
-  case nova::LogLevel::Info:
-    name = "info";
-    break;
-  case nova::LogLevel::Debug:
-    name = "debug";
-    break;
-  case nova::LogLevel::Error:
-    name = "error";
-    break;
-  case nova::LogLevel::Warn:
-    name = "warn";
-    break;
-  case nova::LogLevel::None:
-    name = "none";
-    break;
-  }
-  return formatter<string_view>::format(name, ctx);
+  return formatter<string_view>::format(to_string(level), ctx);
 }

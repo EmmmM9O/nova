@@ -51,6 +51,8 @@ class Application : public Disposable {
   virtual bool openURI(std::string url);
   virtual void dispose() override;
   virtual void exit() = 0;
+  virtual int getJavaVersion();
+  virtual long getMaxMemory();
 };
 class ApplicationCore : public ApplicationListener {
  protected:

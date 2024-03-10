@@ -13,7 +13,7 @@ enum class LogLevel {
   Error,
   None,
 };
-
+std::string to_string(LogLevel level);
 class logger {
 
 public:

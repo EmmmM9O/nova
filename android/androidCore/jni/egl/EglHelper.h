@@ -5,28 +5,23 @@
 #ifndef NATIVEOPNEGLDEMO_EGLHELPER_H
 #define NATIVEOPNEGLDEMO_EGLHELPER_H
 
-
-#include "EGL/egl.h"
 #include "../log/JniLog.h"
+#include "EGL/egl.h"
 
 class EglHelper {
+ public:
+  EGLDisplay mEglDisplay;
+  EGLContext mEglContext;
+  EGLSurface mEglSurface;
 
+ public:
+  EglHelper();
 
-public:
-    EGLDisplay mEglDisplay;
-    EGLContext mEglContext;
-    EGLSurface mEglSurface;
+  ~EglHelper();
 
-
-public:
-    EglHelper();
-
-    ~EglHelper();
-
-    int initEgl(EGLNativeWindowType surface);
-    int swapBuffers();
-    void destroyEgl();
+  int initEgl(EGLNativeWindowType surface);
+  int swapBuffers();
+  void destroyEgl();
 };
 
-
-#endif //NATIVEOPNEGLDEMO_EGLHELPER_H
+#endif  // NATIVEOPNEGLDEMO_EGLHELPER_H

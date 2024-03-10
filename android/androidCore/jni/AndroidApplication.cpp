@@ -1,5 +1,9 @@
 #include "AndroidApplication.hpp"
 
+#include <filesystem>
+#include <memory>
+#include <string>
+
 #include "android/androidCore/jni/egl/EglThread.h"
 #include "android/native_window_jni.h"
 #include "core/Log.hpp"
@@ -7,11 +11,8 @@
 #include "core/application.hpp"
 #include "jni.h"
 #include "log/JniLog.h"
-#include <filesystem>
-#include <memory>
-#include <string>
 namespace nova {
-void callBackOnCreate() { }
+void callBackOnCreate() {}
 
 void callBackOnChange(int width, int height) {
   glViewport(0, 0, width, height);
@@ -30,9 +31,9 @@ void AndroidApplication::initialize(
     AndroidApplicationConfiguration config) {
   env->GetJavaVM(&javaVM);
   coreActivity = env->NewGlobalRef(activity);
- //LOGD("%d",getVersion()); 
-    auto str=getFilesDirJava();
-    logJava("jni" + str);
+  // LOGD("%d",getVersion());
+  auto str = getFilesDirJava();
+  logJava("jni" + str);
   filesDir = std::filesystem::path(str);
   Log::my_logger.logDir = filesDir / "logs";
   addListener(listener);
@@ -239,4 +240,25 @@ std::string AndroidApplication::getFilesDirJava() {
   env->ReleaseStringUTFChars(jstr, tmp);
   return str;
 }
-} // namespace nova
+int AndroidApplication::getJavaVersion() {
+  JNIEnv *env;
+  javaVM->AttachCurrentThreadAsDaemon(&env, nullptr);
+  return env->GetVersion();
+}
+long AndroidApplication::getMaxMemory() {
+  JNIEnv *env;
+  javaVM->AttachCurrentThreadAsDaemon(&env, nullptr);
+  jclass javaClass = env->GetObjectClass(coreActivity);
+  if (javaClass == nullptr) {
+    LOGE("fail to find activity class");
+    return 0;
+  }
+  jmethodID javaMethod = env->GetMethodID(javaClass, "getMaxMemory", "()L");
+  if (javaMethod == nullptr) {
+    LOGE("fail to find method getMaxMemory");
+    return 0;
+  }
+  long res = env->CallLongMethod(coreActivity, javaMethod);
+  return res;
+}
+}  // namespace nova

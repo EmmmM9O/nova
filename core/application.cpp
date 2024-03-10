@@ -5,6 +5,7 @@
 #include <iterator>
 #include <memory>
 #include <mutex>
+#include <string>
 namespace nova {
 void Application::addListener(std::shared_ptr<ApplicationListener> listener) {
   std::lock_guard<std::mutex> guard(mt);
@@ -28,6 +29,8 @@ bool Application::openURI(std::string url) { return false; }
 void Application::dispose() {}
 long Application::getNativeHeap() { return 0; }
 long Application::getJavaHeap() { return 0; }
+int Application::getJavaVersion() { return -1; }
+long Application::getMaxMemory() { return 0; }
 std::mutex Application::mt;
 void ApplicationCore::add(std::shared_ptr<ApplicationListener> listener) {
   modules.push_back(listener);

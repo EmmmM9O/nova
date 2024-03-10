@@ -21,33 +21,31 @@ import java.util.Date;
 public class AndroidApplication extends Activity {
     protected ClipboardManager clipboard;
     protected CrashHandler crashHandler;
-    private void saveInfoToFile (String str) {
-        String fileName = "testlog_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".txt";
-        File file = new File(getExternalFilesDir(null),fileName);
 
-       FileWriter fileWriter = null;
-try {
-	            fileWriter = new FileWriter(file,true);  // 创建一个新的FileWriter对象，指定要写入的文件
-								            fileWriter.write(str+"\n");  // 将字符串写入文件
-								                     }
-catch (IOException e) {
-	            e.printStackTrace();
-		            } finally {
-				    if (fileWriter != null) {
-					                    try {
-								    fileWriter.close();
-							    } catch (IOException e) {
-								                        e.printStackTrace();
-											                }
-			    }
-			    }
+    public void saveInfoToFile(String str) {
+        String fileName = "testlog_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".txt";
+        File file = new File(getExternalFilesDir(null), fileName);
+
+        FileWriter fileWriter = null;
+        try {
+            fileWriter = new FileWriter(file, true);
+            fileWriter.write(str + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fileWriter != null) {
+                try {
+                    fileWriter.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
+
     protected void init() {
         crashHandler = new CrashHandler(new File(getFilesDir(), "crash"));
-	Toast toast = Toast.makeText(this, getFilesDirString(), Toast.LENGTH_SHORT);
-	    toast.show();
         this.clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-	saveInfoToFile(getFilesDirString());
         NativeAndroidApplication.initJNI(this);
     }
 
@@ -109,6 +107,9 @@ catch (IOException e) {
 
     public long getNativeHeap() {
         return Debug.getNativeHeapAllocatedSize();
+    }
+    public long getMaxMemory(){
+        return Runtime.getRuntime().maxMemory();
     }
 
     public void exit() {
