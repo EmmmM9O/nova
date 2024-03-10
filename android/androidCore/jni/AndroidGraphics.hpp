@@ -4,18 +4,19 @@
 #include "jni.h"
 namespace nova {
 class AndroidGraphics : public Graphics {
- protected:
+protected:
   EGLDisplay mEglDisplay;
   EGLContext mEglContext;
   EGLSurface mEglSurface;
   ANativeWindow *mANativeWindow = nullptr;
 
- public:
+public:
   GLVersion glVersion;
   AndroidGraphics();
   GLVersion getGLVersion() override;
   void setupGL();
   void init(JNIEnv *env, jobject instance, jobject surface);
   void destory();
+  int swapBuffers();
 };
-}  // namespace nova
+} // namespace nova

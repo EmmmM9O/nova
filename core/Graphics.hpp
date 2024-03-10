@@ -1,10 +1,8 @@
 #pragma once
-#include <any>
 #include <string>
 
 #include "application.hpp"
-#include "fmt/base.h"
-
+#include <fmt/core.h>
 namespace nova {
 class Color {
  public:

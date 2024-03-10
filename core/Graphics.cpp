@@ -35,7 +35,7 @@ GLVersion::GLVersion(systemType appType, std::string vendorString,
   else
     type = GlType::NONE;
   if (type == GlType::GLES) {
-    extractVersion(R"(OpenGL ES (\d+(\.\d+){0,2}))", versionString);
+    extractVersion("OpenGL ES (\\d(\\.\\d){0,2})", versionString);
   } else if (type == GlType::WebGL) {
     extractVersion("WebGL (\\d(\\.\\d){0,2})", versionString);
   } else if (type == GlType::OpenGL) {
@@ -54,7 +54,7 @@ void GLVersion::extractVersion(std::string patternString,
 	Log_debug("extract {}",versionString);
   std::regex re(patternString);
   std::smatch m;
-  if (std::regex_match(versionString, m, re)) {
+  if (std::regex_search(versionString, m, re)) {
 	Log_debug("extract successful {}",m[1].str());
     auto resultSplit = split(m[1].str(), '.');
     majorVersion = parseInt(resultSplit[0], 2);
