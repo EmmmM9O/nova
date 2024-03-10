@@ -3,9 +3,13 @@
 //
 
 #include "EglHelper.h"
+
 #include <GLES2/gl2.h>
+
 #include "EGL/egl.h"
+#include "core/Graphics.hpp"
 #include "core/Log.hpp"
+#include "core/application.hpp"
 
 EglHelper::EglHelper() {
   mEglDisplay = EGL_NO_DISPLAY;
@@ -81,11 +85,15 @@ int EglHelper::initEgl(EGLNativeWindowType window) {
     LOGE("eglMakeCurrent  error");
     return -1;
   }
-
+  nova::GLVersion glVersion(
+      nova::systemType::Android,
+      reinterpret_cast<const char *>(glGetString(GL_VENDOR)),
+      reinterpret_cast<const char *>(glGetString(GL_RENDERER)),
+      reinterpret_cast<const char *>(glGetString(GL_VERSION)));
   // 7. 刷新数据，显示渲染场景 -- eglSwapBuffers
-  nova::Log::my_logger.log(std::source_location::current(),
-                           nova::LogLevel::Info, "EGL version {} GLES {}",
-                           eglQueryString(mEglDisplay, EGL_VERSION),reinterpret_cast<const char*>(glGetString(GL_VERSION)));
+  nova::Log::my_logger.log(
+      std::source_location::current(), nova::LogLevel::Info,
+      "{}", nova::to_string(glVersion));
   return 0;
 }
 

@@ -28,6 +28,9 @@ class GLVersion {
   std::string toString();
   GLVersion(systemType appType, std::string vendorString,
             std::string rendererString, std::string versionString);
+
+ private:
+  void extractVersion(std::string patternString, std::string versionString);
 };
 std::string to_string(GLVersion gl);
 class Graphics : public Disposable {
