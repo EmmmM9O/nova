@@ -7,8 +7,8 @@
 #include "core/Log.hpp"
 #include "nova_android_NativeAndroidApplication.h"
 #include "source_location"
-std::shared_ptr<nova::AndroidApplication> nova::android::app(
-    new nova::AndroidApplication());
+std::shared_ptr<nova::AndroidApplication> nova::android::app =
+    std::make_shared<AndroidApplication>(nova::AndroidApplication());
 JNIEXPORT void JNICALL
 Java_nova_android_NativeAndroidApplication_nativeSurfaceCreate(JNIEnv *env,
                                                                jclass,

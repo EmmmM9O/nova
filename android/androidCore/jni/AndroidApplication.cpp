@@ -31,7 +31,6 @@ void AndroidApplication::initialize(
     AndroidApplicationConfiguration config) {
   env->GetJavaVM(&javaVM);
   coreActivity = env->NewGlobalRef(activity);
-  // LOGD("%d",getVersion());
   auto str = getFilesDirJava();
   logJava("jni" + str);
   filesDir = std::filesystem::path(str);

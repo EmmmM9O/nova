@@ -1,13 +1,2 @@
 Checks: '-*,readability-identifier-naming'
-CheckOptions:
-  # 函数名字改为小驼峰
-- key: readability-identifier-naming.FunctionCase
- value: camelBack
-   # 类名改为大驼峰
-- key: readability-identifier-naming.ClassCase
-  value: CamelCase
-
-  WarningsAsErrors: ''
-  HeaderFilterRegex: '.*'
-  # 和format联动。
 FormatStyle: 'file'

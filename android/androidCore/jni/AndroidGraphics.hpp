@@ -17,6 +17,7 @@ public:
   void setupGL();
   void init(JNIEnv *env, jobject instance, jobject surface);
   void destory();
-  int swapBuffers();
+  void swapBuffers();
+    void run();
 };
 } // namespace nova

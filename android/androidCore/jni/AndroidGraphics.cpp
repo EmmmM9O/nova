@@ -109,12 +109,13 @@ void AndroidGraphics::destory() {
     }
   }
 }
-int AndroidGraphics::swapBuffers() {
+void AndroidGraphics::swapBuffers() {
   if (mEglDisplay != EGL_NO_DISPLAY && mEglSurface != EGL_NO_SURFACE &&
       eglSwapBuffers(mEglDisplay, mEglSurface)) {
-    return 0;
   }
-  return -1;
+}
+void AndroidGraphics::run(){
+
 }
 GLVersion AndroidGraphics::getGLVersion() { return glVersion; }
 }  // namespace nova
