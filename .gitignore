@@ -42,4 +42,7 @@ build/
 *.keystore
 temp/
 .clangd
-android/androidCore/.clangd
+android/.clangd
+android/dist
+android/target
+*.class
