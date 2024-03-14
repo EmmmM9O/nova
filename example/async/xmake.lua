@@ -1,0 +1,8 @@
+target("async-exampele")
+set_kind("binary")
+add_cxxflags("-Wall")
+add_files("**.cpp")
+add_includedirs("$(projectdir)/../../")
+add_includedirs("$(projectdir)")
+add_deps("nova-core")
+set_languages("c++2a")

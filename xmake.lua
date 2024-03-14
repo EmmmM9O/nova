@@ -29,6 +29,8 @@ add_deps("nova-core")
 set_languages("c++2a")
 add_files("desktop/**.cpp", sys.."/**.cpp","desktop/**.c")
 
+includes("example/**.xmake")
+
 
 
 
