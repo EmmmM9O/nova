@@ -6,8 +6,8 @@
 #include <regex>
 #include <string>
 
-#include "core/Util.hpp"
 #include "core/Log.hpp"
+#include "core/Util.hpp"
 #include "core/application.hpp"
 namespace nova {
 std::string to_string(GlType gl) {
@@ -51,17 +51,17 @@ GLVersion::GLVersion(systemType appType, std::string vendorString,
 
 void GLVersion::extractVersion(std::string patternString,
                                std::string versionString) {
-	Log_debug("extract {}",versionString);
+  Log_debug("extract {}", versionString);
   std::regex re(patternString);
   std::smatch m;
   if (std::regex_search(versionString, m, re)) {
-	Log_debug("extract successful {}",m[1].str());
+    Log_debug("extract successful {}", m[1].str());
     auto resultSplit = split(m[1].str(), '.');
     majorVersion = parseInt(resultSplit[0], 2);
     minorVersion = resultSplit.size() < 2 ? 0 : parseInt(resultSplit[1], 0);
     releaseVersion = resultSplit.size() < 3 ? 0 : parseInt(resultSplit[2], 0);
   } else {
-	Log_debug("extract failed {}","error");
+    Log_debug("extract failed {}", "error");
     majorVersion = 2;
     minorVersion = 0;
     releaseVersion = 0;

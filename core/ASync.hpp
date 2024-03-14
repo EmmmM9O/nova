@@ -1,6 +1,4 @@
 #pragma once
-#include "concepts"
-#include "source_location"
 #include <any>
 #include <exception>
 #include <memory>
@@ -8,15 +6,18 @@
 #include <queue>
 #include <type_traits>
 #include <typeinfo>
+
+#include "concepts"
+#include "source_location"
 namespace nova {
 namespace async {
 enum class TaskState { finish, error, running, unPost };
 class Context;
 class Basic_Task {
-protected:
+ protected:
   Context *context;
 
-public:
+ public:
   TaskState state = TaskState::unPost;
   virtual const std::type_info &taskType();
   virtual void stop() = 0;
@@ -30,9 +31,8 @@ public:
   virtual void throwError(
       std::source_location source_location = std::source_location::current());
 };
-class DefaultTask:public Basic_Task{
-public:
-    
+class DefaultTask : public Basic_Task {
+ public:
 };
 template <typename T>
 concept Task_Type = requires(T t) {
@@ -41,17 +41,18 @@ concept Task_Type = requires(T t) {
   std::is_base_of_v<Basic_Task, T>;
 };
 class Context {
-protected:
+ protected:
   std::queue<std::shared_ptr<Basic_Task>> taskList;
   std::mutex task_list_mutex;
 
-public:
+ public:
   void onError(std::exception *exception, std::shared_ptr<Basic_Task>,
                std::source_location source_location);
   void run_once();
   void post_task(std::shared_ptr<Basic_Task> task);
   std::any post_any(std::shared_ptr<Basic_Task> task);
-  template <Task_Type Task> typename Task::return_post_type post(Task task) {
+  template <Task_Type Task>
+  typename Task::return_post_type post(Task task) {
     std::shared_ptr<Task> ptr = std::make_shared<Task>(task);
     post_task(std::static_pointer_cast<Basic_Task>(ptr));
     typename Task::return_post_type res = ptr->return_post();
@@ -59,5 +60,5 @@ public:
   }
 };
 
-} // namespace async
-} // namespace nova
+}  // namespace async
+}  // namespace nova

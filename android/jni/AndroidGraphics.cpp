@@ -114,8 +114,6 @@ void AndroidGraphics::swapBuffers() {
       eglSwapBuffers(mEglDisplay, mEglSurface)) {
   }
 }
-void AndroidGraphics::run(){
-
-}
+void AndroidGraphics::run() {}
 GLVersion AndroidGraphics::getGLVersion() { return glVersion; }
 }  // namespace nova

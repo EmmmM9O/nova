@@ -5,4 +5,4 @@ namespace nova {
 namespace Core {
 extern std::shared_ptr<Application> app;
 }
-} // namespace nova
+}  // namespace nova

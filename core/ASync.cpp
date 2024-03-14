@@ -1,8 +1,10 @@
 #include "ASync.hpp"
-#include "core/Log.hpp"
-#include "source_location"
+
 #include <memory>
 #include <mutex>
+
+#include "core/Log.hpp"
+#include "source_location"
 namespace nova {
 namespace async {
 void Context::onError(std::exception *exception,
@@ -45,5 +47,5 @@ std::any Context::post_any(std::shared_ptr<Basic_Task> task) {
   post_task(task);
   return task->return_post_any();
 }
-} // namespace async
-} // namespace nova
+}  // namespace async
+}  // namespace nova

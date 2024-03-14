@@ -99,7 +99,5 @@ ThreadPool Threads::threadPool =
     ThreadPool(10, [](size_t id, std::runtime_error error) -> void {
 
     });
-void Threads::daemon(Runnable runnable){
-    threadPool.addTask(runnable);
-}
+void Threads::daemon(Runnable runnable) { threadPool.addTask(runnable); }
 }  // namespace nova

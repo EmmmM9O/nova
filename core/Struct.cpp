@@ -1,6 +1,7 @@
 #include "Struct.hpp"
 
 #include <mutex>
+
 #include "core/function.hpp"
 
 namespace nova {
@@ -14,19 +15,17 @@ void TaskQueue::run() {
     }
     runnables.clear();
   }
-    for(auto runnable:runnables){
-        runnable();
-    }
+  for (auto runnable : runnables) {
+    runnable();
+  }
 }
-int TaskQueue::size(){
-    return runnables.size();
+int TaskQueue::size() { return runnables.size(); }
+void TaskQueue::clear() {
+  std::lock_guard<std::mutex> guard(mt);
+  runnables.clear();
 }
-void TaskQueue::clear(){
-    std::lock_guard<std::mutex> guard(mt);
-    runnables.clear();
-}
-void TaskQueue::post(Runnable runnable){
-    std::lock_guard<std::mutex> guard(mt);
-    runnables.push_back(runnable);
+void TaskQueue::post(Runnable runnable) {
+  std::lock_guard<std::mutex> guard(mt);
+  runnables.push_back(runnable);
 }
 }  // namespace nova

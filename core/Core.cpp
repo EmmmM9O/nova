@@ -7,4 +7,4 @@ namespace nova {
 namespace Core {
 std::shared_ptr<Application> app = nullptr;
 }
-} // namespace nova
+}  // namespace nova

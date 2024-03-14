@@ -91,9 +91,9 @@ int EglHelper::initEgl(EGLNativeWindowType window) {
       reinterpret_cast<const char *>(glGetString(GL_RENDERER)),
       reinterpret_cast<const char *>(glGetString(GL_VERSION)));
   // 7. 刷新数据，显示渲染场景 -- eglSwapBuffers
-  nova::Log::my_logger.log(
-      std::source_location::current(), nova::LogLevel::Info,
-      "{}", nova::to_string(glVersion));
+  nova::Log::my_logger.log(std::source_location::current(),
+                           nova::LogLevel::Info, "{}",
+                           nova::to_string(glVersion));
   return 0;
 }
 
