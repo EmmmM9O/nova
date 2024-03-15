@@ -4,6 +4,7 @@
 #include <mutex>
 
 #include "core/Log.hpp"
+#include "core/Threads.hpp"
 #include "source_location"
 namespace nova {
 namespace async {
@@ -18,6 +19,7 @@ void Context::run_once() {
   std::unique_lock<std::mutex> lock(task_list_mutex);
   lock.lock();
   auto top = taskList.front();
+  top->state = TaskState::running;
   taskList.pop();
   lock.unlock();
   if (top->if_run()) {
@@ -25,6 +27,7 @@ void Context::run_once() {
     top->finish();
     if (top->if_delete()) {
       top->on_destroy();
+      top->state = TaskState::finish;
     } else {
       lock.lock();
       taskList.push(top);
@@ -39,6 +42,7 @@ void Context::run_once() {
 void Context::post_task(std::shared_ptr<Basic_Task> task) {
   std::unique_lock<std::mutex> lock(task_list_mutex);
   task->init(this);
+  task->state = TaskState::waiting;
   lock.lock();
   taskList.push(task);
   lock.unlock();
@@ -47,5 +51,5 @@ std::any Context::post_any(std::shared_ptr<Basic_Task> task) {
   post_task(task);
   return task->return_post_any();
 }
-}  // namespace async
-}  // namespace nova
+} // namespace async
+} // namespace nova
