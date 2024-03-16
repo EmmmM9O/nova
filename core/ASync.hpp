@@ -22,7 +22,6 @@ protected:
 public:
   TaskState state = TaskState::unPost;
   virtual const std::type_info &taskType();
-  virtual void stop() = 0;
   virtual void run() = 0;
   virtual bool if_run() = 0;
   virtual bool if_delete() = 0;
@@ -30,23 +29,47 @@ public:
   virtual void init(Context *) = 0;
   virtual void finish() = 0;
   virtual std::any return_post_any() = 0;
-  virtual void throwError(
-      std::source_location source_location = std::source_location::current());
+  virtual void throwError(std::exception *,
+                          std::source_location source_location =
+                              std::source_location::current()) = 0;
 };
 class Runnable_Task : public Basic_Task {
+private:
+  bool stopped = false;
+
 public:
-  std::function<void()> runnable;
-  using return_post_type = std::weak_ptr<Runnable_Task>;
-  virtual const std::type_info &taskType() override;
+  using runnable_function = std::function<void(Context *, Runnable_Task *)>;
+  runnable_function runnable;
+  using return_post_type = Runnable_Task *;
+  const std::type_info &taskType() override final;
   void init(Context *) override final;
   void run() override final;
-  void stop() override final;
+  bool stop();
   bool if_run() override final;
   bool if_delete() override final;
   void on_destroy() override final;
   void finish() override final;
   std::any return_post_any() override final;
-  void throwError(std::source_location source_location =
+  void throwError(std::exception *,
+                  std::source_location source_location =
+                      std::source_location::current()) override final;
+  return_post_type return_post();
+  Runnable_Task(runnable_function);
+};
+class Timer : public Basic_Task {
+public:
+  using runnable_function = std::function<void(Context *, Runnable_Task *)>;
+  using return_post_type = Timer *;
+  bool cancel();
+  void init(Context *) override final;
+  void run() override final;
+  bool if_run() override final;
+  bool if_delete() override final;
+  void on_destroy() override final;
+  void finish() override final;
+  std::any return_post_any() override final;
+  void throwError(std::exception *,
+                  std::source_location source_location =
                       std::source_location::current()) override final;
   return_post_type return_post();
 };
@@ -62,7 +85,7 @@ protected:
   std::mutex task_list_mutex;
 
 public:
-  void onError(std::exception *exception, std::shared_ptr<Basic_Task>,
+  void onError(std::exception *exception, Basic_Task *,
                std::source_location source_location);
   void run_once();
   void post_task(std::shared_ptr<Basic_Task> task);
