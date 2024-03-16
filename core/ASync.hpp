@@ -1,5 +1,6 @@
 #pragma once
 #include <any>
+#include <chrono>
 #include <exception>
 #include <functional>
 #include <memory>
@@ -57,9 +58,15 @@ public:
   Runnable_Task(runnable_function);
 };
 class Timer : public Basic_Task {
+private:
+  int repeatCount;
+
 public:
   using runnable_function = std::function<void(Context *, Runnable_Task *)>;
   using return_post_type = Timer *;
+  int getRepactCount();
+  float getInterval();
+  float getDelay();
   bool cancel();
   void init(Context *) override final;
   void run() override final;
@@ -72,6 +79,7 @@ public:
                   std::source_location source_location =
                       std::source_location::current()) override final;
   return_post_type return_post();
+
 };
 template <typename T>
 concept Task_Type = requires(T t) {
@@ -90,11 +98,11 @@ public:
   void run_once();
   void post_task(std::shared_ptr<Basic_Task> task);
   std::any post_any(std::shared_ptr<Basic_Task> task);
-  template <Task_Type Task> typename Task::return_post_type post(Task task) {
+  template <Task_Type Task, class Task_Return = Task::return_post_type>
+  Task_Return post(Task task) {
     std::shared_ptr<Task> ptr = std::make_shared<Task>(task);
     post_task(std::static_pointer_cast<Basic_Task>(ptr));
-    typename Task::return_post_type res = ptr->return_post();
-    return res;
+    return ptr->return_post();
   }
 };
 
