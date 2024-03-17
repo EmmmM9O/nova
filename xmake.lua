@@ -1,6 +1,7 @@
 add_rules("plugin.compile_commands.autoupdate", { outputdir = ".vscode" })
 add_rules("mode.debug", "mode.release")
-add_requires("glfw", "fmt")
+includes("third_party/**.lua")
+add_requires("glfw")
 set_languages("c++20")
 local sys = is_os("windows") and "windows" or is_os("linux") and "linux" 
 task("format")
@@ -15,9 +16,10 @@ task_end()
 target("nova-core")
 set_kind("static")
 add_cxxflags("-Wall")
-add_files("core/**.cpp")
-add_includedirs("$(projectdir)")
-add_packages("stb", "fmt","pthread")
+add_files("core/**.cpp", sys.."/**.cpp")
+add_includedirs("$(projectdir)","$(projectdir)/third_party/fmt/include")
+add_deps("fmt")
+add_packages("pthread")
 set_languages("c++2a")
 
 target("nova-desktop")
@@ -27,9 +29,9 @@ add_cxxflags("-Wall")
 add_packages("glfw")
 add_deps("nova-core")
 set_languages("c++2a")
-add_files("desktop/**.cpp", sys.."/**.cpp","desktop/**.c")
+add_files("desktop/**.cpp","desktop/**.c")
 
-includes("example/**.xmake")
+includes("example/**.lua")
 
 
 

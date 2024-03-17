@@ -46,3 +46,4 @@ android/.clangd
 android/dist
 android/target
 *.class
+logs/

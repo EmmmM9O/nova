@@ -51,7 +51,7 @@ void logger::_log(const std::source_location &location, const LogLevel &level,
 #else
   auto res = timeFormat(str);
   printCosnole(res, level);
-  writeFile(rea, level);
+  writeFile(res, level);
 #endif
 }
 void logger::writeFile(std::string str, LogLevel level) {

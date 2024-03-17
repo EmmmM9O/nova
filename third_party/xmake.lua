@@ -1,0 +1,6 @@
+target("fmt")
+set_kind("static")
+add_includedirs("$(projectdir)/third_party/fmt/include")
+set_languages("c++11")
+add_cxxflags("-fexceptions")
+add_files("fmt/src/format.cc")
