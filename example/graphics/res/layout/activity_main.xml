@@ -5,7 +5,7 @@
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   tools:context=".AndroidApplication">
-  <nova.android.opengl.GLSurfaceView
+  <nova.example.opengl.GLSurfaceView
     android:layout_width="match_parent"
     android:layout_height="match_parent" />
 </RelativeLayout>

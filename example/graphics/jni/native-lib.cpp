@@ -45,6 +45,7 @@ Java_nova_example_NativeAndroidApplication_nativeSurfaceDestroyed(
  */
 JNIEXPORT void JNICALL Java_nova_example_NativeAndroidApplication_initJNI(
     JNIEnv *env, jclass, jobject activity) {
+	
   nova::android::app->initialize(env, activity, nullptr, {});
   nova::Log::my_logger.log(std::source_location::current(),
                            nova::LogLevel::Info, "sdk version {}",
@@ -52,5 +53,7 @@ JNIEXPORT void JNICALL Java_nova_example_NativeAndroidApplication_initJNI(
 }
 JNIEXPORT void JNICALL Java_nova_example_NativeAndroidApplication_onDestory(
     JNIEnv *env, jclass, jobject activity) {
+	
   nova::android::app->onDestroy(env, activity);
+  nova::android::app.reset();
 }
