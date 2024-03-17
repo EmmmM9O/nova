@@ -1,10 +1,10 @@
-package nova.android.opengl;
+package nova.example.opengl;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import nova.android.NativeAndroidApplication;
+import nova.example.NativeAndroidApplication;
 
 public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
     public GLSurfaceView(Context context) {

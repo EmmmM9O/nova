@@ -1,7 +1,7 @@
-package nova.android;
+package nova.example;
 
 import android.view.Surface;
-import nova.android.opengl.GLSurfaceView;
+import nova.example.opengl.GLSurfaceView;
 import android.util.Log;
 
 public class NativeAndroidApplication {

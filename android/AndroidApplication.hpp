@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-#include "android/androidCore/jni/egl/EglThread.h"
+#include "egl/EglThread.h"
 #include "core/application.hpp"
 #include "jni.h"
 namespace nova {
@@ -44,5 +44,6 @@ class AndroidApplication : public Application {
   void logJava(std::string text);
   int getJavaVersion() override;
   long getMaxMemory() override;
+  bool running() override;
 };
 }  // namespace nova

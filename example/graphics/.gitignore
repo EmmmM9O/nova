@@ -5,3 +5,5 @@ libs
 obj
 *.class
 *.jar
+tmp/
+

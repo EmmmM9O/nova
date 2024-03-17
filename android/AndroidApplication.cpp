@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-#include "android/androidCore/jni/egl/EglThread.h"
+#include "egl/EglThread.h"
 #include "android/native_window_jni.h"
 #include "core/Log.hpp"
 #include "core/Threads.hpp"
@@ -22,6 +22,8 @@ void callBackOnDraw() {
   glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 }
+bool AndroidApplication::running() {
+return true;}
 AndroidApplication::AndroidApplication() {}
 runType AndroidApplication::getType() { return runType::Desktop; }
 systemType AndroidApplication::getSystem() { return systemType::Android; }
