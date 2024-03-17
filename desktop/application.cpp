@@ -1,7 +1,6 @@
 
 #include "application.hpp"
 
-
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -28,7 +27,7 @@ DesktopApplication::DesktopApplication(
   listen([](std::shared_ptr<ApplicationListener> l) -> void { l->exit(); });
   cleanup();
 }
-void DesktopApplication::exit() { running = false; }
+void DesktopApplication::exit() { _running = false; }
 void DesktopApplication::post(Runnable runnable) {
   Threads::threadPool.addTask(runnable);
 }
@@ -45,7 +44,7 @@ void DesktopApplication::setClipboardText(std::string text) {
 int DesktopApplication::init() {
   listen([](std::shared_ptr<ApplicationListener> l) -> void { l->init(); });
   glfwSetErrorCallback([](int code, const char* str) -> void {
-        Log_error("glfw error code : {} {}",code,str);
+    Log_error("glfw error code : {} {}", code, str);
   });
   if (!glfwInit()) {
     Log_error("glfw {} error", "init");
@@ -65,7 +64,7 @@ int DesktopApplication::init() {
 void DesktopApplication::loop() {
   listen([](std::shared_ptr<ApplicationListener> l) -> void { l->init(); });
 
-  while (!glfwWindowShouldClose(window)) {
+  while (!glfwWindowShouldClose(window) && _running) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(49.f / 255, 77.f / 255, 121.f / 255, 1.f);
     glfwSwapBuffers(window);
@@ -91,7 +90,12 @@ void DesktopApplication::cleanup() {
     l->dispose();
   });
   dispose();
+  for (auto l : listeners) {
+    l.reset();
+  }
+  _cleanup = true;
 }
+bool DesktopApplication::running() { return !_cleanup; }
 void DesktopApplication::addListener(
     std::shared_ptr<ApplicationListener> listener) {
   std::lock_guard<std::mutex> guard(mt);

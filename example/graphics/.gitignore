@@ -1,0 +1,7 @@
+.clangd
+dist
+target
+libs
+obj
+*.class
+*.jar

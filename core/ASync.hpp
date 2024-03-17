@@ -109,7 +109,7 @@ class Context {
   void run_once();
   void post_task(std::shared_ptr<Basic_Task> task);
   std::any post_any(std::shared_ptr<Basic_Task> task);
-  template <Task_Type Task, class Task_Return = Task::return_post_type>
+  template <Task_Type Task, class Task_Return = typename Task::return_post_type>
   Task_Return post(Task task) {
     std::shared_ptr<Task> ptr = std::make_shared<Task>(task);
     post_task(std::static_pointer_cast<Basic_Task>(ptr));

@@ -1,6 +1,7 @@
 #pragma once
 #include <desktop/include/glad.h>
 #include <GLFW/glfw3.h>
+
 #include <functional>
 #include <memory>
 #include <string>
@@ -19,12 +20,14 @@ class DesktopApplication : public Application {
   listenersType listeners;
   DesktopConfig config;
   int init();
-  bool running = true;
+  bool _running = true;
+  bool _cleanup = false;
   GLFWwindow* window;
   void listen(std::function<void(std::shared_ptr<ApplicationListener>)> func);
   void loop();
 
  public:
+  bool running() override;
   void addListener(std::shared_ptr<ApplicationListener> listener) override;
   void removeListener(std::shared_ptr<ApplicationListener> listener) override;
   void cleanup();

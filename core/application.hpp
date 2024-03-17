@@ -30,6 +30,7 @@ class Application : public Disposable {
   static std::mutex mt;
 
  public:
+  virtual bool running() = 0;
   virtual listenersType &getListeners() = 0;
   virtual void addListener(std::shared_ptr<ApplicationListener> listener);
   virtual void removeListener(std::shared_ptr<ApplicationListener> listener);
