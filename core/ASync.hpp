@@ -21,7 +21,7 @@ class Basic_Task {
 
  public:
   TaskState state = TaskState::unPost;
-  virtual const std::type_info &taskType()=0;
+  virtual const std::type_info &taskType() = 0;
   virtual void run() = 0;
   virtual bool if_run() = 0;
   virtual bool if_delete() = 0;
@@ -55,6 +55,39 @@ class Runnable_Task : public Basic_Task {
                       std::source_location::current()) override final;
   return_post_type return_post();
   Runnable_Task(runnable_function);
+};
+class WhileUtilTask : public Basic_Task {
+ private:
+  bool stopped = false;
+
+ public:
+  using runnable_function = std::function<void(Context *, WhileUtilTask *)>;
+  using bool_function = std::function<bool(Context *, WhileUtilTask *)>;
+  runnable_function runnable;
+  bool_function util;
+  using return_post_type = WhileUtilTask *;
+  const std::type_info &taskType() override final;
+  void init(Context *) override final;
+  void run() override final;
+  bool stop();
+  bool if_run() override final;
+  bool if_delete() override final;
+  void on_destroy() override final;
+  void finish() override final;
+  std::any return_post_any() override final;
+  void throwError(std::exception *,
+                  std::source_location source_location =
+                      std::source_location::current()) override final;
+  return_post_type return_post();
+  WhileUtilTask(runnable_function, bool_function);
+};
+
+template <typename Return>
+class Promise {
+  class Promise_Return {
+   private:
+    Promise<Return> *promise;
+  };
 };
 class Timer : public Basic_Task {
  public:

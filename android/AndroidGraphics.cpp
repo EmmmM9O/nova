@@ -2,6 +2,7 @@
 
 #include "EGL/egl.h"
 #include "EGL/eglplatform.h"
+#include "GLES3/gl3.h"
 #include "android/native_window_jni.h"
 #include "core/Graphics.hpp"
 #include "core/application.hpp"
@@ -27,11 +28,6 @@ void AndroidGraphics::init(JNIEnv *env, jobject instance, jobject surface) {
     LOGE("eglInitialize error");
     return;
   }
-  std::string vendorString = eglQueryString(mEglDisplay, EGL_VENDOR);
-  std::string rendererString = eglQueryString(mEglDisplay, EGL_VENDOR);
-  std::string versionString = eglQueryString(mEglDisplay, EGL_VERSION);
-  glVersion = GLVersion(systemType::Android, vendorString, rendererString,
-                        versionString);
   // 3. 设置显示设备的属性
   const EGLint attrib_config_list[] = {EGL_RED_SIZE,
                                        8,
@@ -84,7 +80,11 @@ void AndroidGraphics::init(JNIEnv *env, jobject instance, jobject surface) {
     LOGE("eglMakeCurrent  error");
     return;
   }
-
+  glVersion =
+      nova::GLVersion(nova::systemType::Android,
+                      reinterpret_cast<const char *>(glGetString(GL_VENDOR)),
+                      reinterpret_cast<const char *>(glGetString(GL_RENDERER)),
+                      reinterpret_cast<const char *>(glGetString(GL_VERSION)));
   // 7. 刷新数据，显示渲染场景 -- eglSwapBuffers
 }
 void AndroidGraphics::destory() {

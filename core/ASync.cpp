@@ -10,6 +10,7 @@
 #include "source_location"
 namespace nova {
 namespace async {
+// Context
 void Context::onError(std::exception *exception, Basic_Task *task,
                       std::source_location source_location) {
   nova::Log::my_logger.log(source_location, LogLevel::Error,
@@ -18,40 +19,39 @@ void Context::onError(std::exception *exception, Basic_Task *task,
 }
 void Context::run_once() {
   std::unique_lock<std::mutex> lock(task_list_mutex);
-  if(!taskList.empty()){
-  auto top =std::move(taskList.front());
-  top->state = TaskState::running;
-  taskList.pop();
-  lock.unlock();
-  if (top->if_run()) {
-    top->run();
-    top->finish();
-  }
-  if (top->if_delete()) {
-    top->on_destroy();
-    top->state = TaskState::finish;
-  } else {
-    lock.lock();
-    taskList.push(std::move(top));
+  if (!taskList.empty()) {
+    auto top = std::move(taskList.front());
+    top->state = TaskState::running;
+    taskList.pop();
     lock.unlock();
-  }
+    if (top->if_run()) {
+      top->run();
+      top->finish();
+    }
+    if (top->if_delete()) {
+      top->on_destroy();
+      top->state = TaskState::finish;
+    } else {
+      lock.lock();
+      taskList.push(std::move(top));
+      lock.unlock();
+    }
   }
 }
-bool Context::isEmpty(){
-	return taskList.empty();
-}
+bool Context::isEmpty() { return taskList.empty(); }
 void Context::post_task(std::shared_ptr<Basic_Task> task) {
   task->init(this);
   task->state = TaskState::waiting;
   {
-  std::unique_lock<std::mutex> lock(task_list_mutex);
-  taskList.push(task);
+    std::unique_lock<std::mutex> lock(task_list_mutex);
+    taskList.push(task);
   }
 }
 std::any Context::post_any(std::shared_ptr<Basic_Task> task) {
   post_task(task);
   return task->return_post_any();
 }
+// Runnable_Task
 Runnable_Task::return_post_type Runnable_Task::return_post() { return this; }
 std::any Runnable_Task::return_post_any() { return return_post(); }
 void Runnable_Task::run() { runnable(context, this); }
@@ -76,7 +76,31 @@ void Runnable_Task::throwError(std::exception *e,
                                std::source_location source_location) {
   context->onError(e, this, source_location);
 }
-
+// WhikeUtilTask
+const std::type_info &WhileUtilTask::taskType() {
+  return typeid(WhileUtilTask);
+}
+void WhileUtilTask::init(Context *c) { this->context = c; }
+void WhileUtilTask::run() { runnable(context, this); }
+bool WhileUtilTask::stop() {
+  if (stopped) return false;
+  stopped = true;
+  return true;
+}
+bool WhileUtilTask::if_run() { return !stopped && !util(context, this); }
+bool WhileUtilTask::if_delete() { return stopped || util(context, this); }
+void WhileUtilTask::on_destroy() {}
+void WhileUtilTask::finish() {}
+std::any WhileUtilTask::return_post_any() { return return_post(); }
+void WhileUtilTask::throwError(std::exception *e,
+                               std::source_location source_location) {
+  context->onError(e, this, source_location);
+}
+WhileUtilTask::return_post_type WhileUtilTask::return_post() { return this; }
+WhileUtilTask::WhileUtilTask(WhileUtilTask::runnable_function run,
+                             WhileUtilTask::bool_function util)
+    : runnable(run), util(util) {}
+// Timer
 int Timer::getRepactCount() { return repeatCount; }
 int Timer::getRunTimes() { return times; }
 std::chrono::milliseconds Timer::getInterval() { return interval; }
@@ -96,15 +120,16 @@ bool Timer::if_run() {
 }
 bool Timer::if_delete() { return (stopped) || (times > repeatCount); }
 void Timer::on_destroy() {}
-void Timer::finish() { times++;lastRun=std::chrono::steady_clock::now(); }
+void Timer::finish() {
+  times++;
+  lastRun = std::chrono::steady_clock::now();
+}
 std::any Timer::return_post_any() { return return_post(); }
 void Timer::throwError(std::exception *e,
                        std::source_location source_location) {
   context->onError(e, this, source_location);
 }
-const std::type_info &Timer::taskType() {
-  return typeid(Timer);
-}
+const std::type_info &Timer::taskType() { return typeid(Timer); }
 Timer::return_post_type Timer::return_post() { return this; }
 Timer::Timer(runnable_function func, std::chrono::milliseconds delay,
              std::chrono::milliseconds interval, int repeatCount)
@@ -115,5 +140,6 @@ Timer::Timer(runnable_function func, std::chrono::milliseconds delay,
       times(1) {
   lastRun = std::chrono::steady_clock::now();
 }
+
 }  // namespace async
 }  // namespace nova
