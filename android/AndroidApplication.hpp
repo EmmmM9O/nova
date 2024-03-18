@@ -4,8 +4,8 @@
 #include <memory>
 #include <string>
 
-#include "egl/EglThread.h"
 #include "core/application.hpp"
+#include "egl/EglThread.h"
 #include "jni.h"
 namespace nova {
 struct AndroidApplicationConfiguration {};

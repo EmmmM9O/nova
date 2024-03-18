@@ -15,12 +15,13 @@ enum class LogLevel {
 };
 std::string to_string(LogLevel level);
 class logger {
-public:
+ public:
   std::time_t time = std::time(nullptr);
   const bool useColors = true;
   std::string_view formatTime = "[{time:%H:%M:%S %Y-%m-%d}]{context}";
-  std::string_view formatStyle = "[{level}][File:[{file}] Func:[{function}] "
-                                 "Line:[{line}]]\n>{context}";
+  std::string_view formatStyle =
+      "[{level}][File:[{file}] Func:[{function}] "
+      "Line:[{line}]]\n>{context}";
   std::filesystem::path logDir;
   std::string_view fileFormat = "log-{time:%Y-%m-%d}.log";
 
@@ -44,7 +45,7 @@ public:
   void printCosnole(std::string str, LogLevel level);
 };
 class Log {
-public:
+ public:
   static logger my_logger;
   template <typename... Args>
   static void log(const std::source_location &location, const LogLevel &level,
@@ -72,22 +73,23 @@ public:
     log(location, LogLevel::Debug, str, args...);
   }
 };
-} // namespace nova
-template <> struct fmt::formatter<nova::LogLevel> : formatter<string_view> {
+}  // namespace nova
+template <>
+struct fmt::formatter<nova::LogLevel> : formatter<string_view> {
   auto format(nova::LogLevel level, format_context &ctx) const;
 };
-#define Log_log(level, format, ...)                                            \
-  nova::Log::my_logger.log(std::source_location::current(), level, format,     \
+#define Log_log(level, format, ...)                                        \
+  nova::Log::my_logger.log(std::source_location::current(), level, format, \
                            __VA_ARGS__)
-#define Log_info(format, ...)                                                  \
-  nova::Log::my_logger.log(std::source_location::current(), nova::LogLevel::Info,    \
-                           format, __VA_ARGS__)
-#define Log_debug(format, ...)                                                 \
-  nova::Log::my_logger.log(std::source_location::current(), nova::LogLevel::Debug,   \
-                           format, __VA_ARGS__)
-#define Log_warn(format, ...)                                                  \
-  nova::Log::my_logger.log(std::source_location::current(), nova::LogLevel::Warn,    \
-                           format, __VA_ARGS__)
-#define Log_error(format, ...)                                                 \
-  nova::Log::my_logger.log(std::source_location::current(), nova::LogLevel::Error,   \
-                           format, __VA_ARGS__)
+#define Log_info(format, ...)                               \
+  nova::Log::my_logger.log(std::source_location::current(), \
+                           nova::LogLevel::Info, format, __VA_ARGS__)
+#define Log_debug(format, ...)                              \
+  nova::Log::my_logger.log(std::source_location::current(), \
+                           nova::LogLevel::Debug, format, __VA_ARGS__)
+#define Log_warn(format, ...)                               \
+  nova::Log::my_logger.log(std::source_location::current(), \
+                           nova::LogLevel::Warn, format, __VA_ARGS__)
+#define Log_error(format, ...)                              \
+  nova::Log::my_logger.log(std::source_location::current(), \
+                           nova::LogLevel::Error, format, __VA_ARGS__)

@@ -4,11 +4,11 @@
 #include <memory>
 #include <string>
 
-#include "egl/EglThread.h"
 #include "android/native_window_jni.h"
 #include "core/Log.hpp"
 #include "core/Threads.hpp"
 #include "core/application.hpp"
+#include "egl/EglThread.h"
 #include "jni.h"
 #include "log/JniLog.h"
 namespace nova {
@@ -22,8 +22,7 @@ void callBackOnDraw() {
   glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 }
-bool AndroidApplication::running() {
-return true;}
+bool AndroidApplication::running() { return true; }
 AndroidApplication::AndroidApplication() {}
 runType AndroidApplication::getType() { return runType::Desktop; }
 systemType AndroidApplication::getSystem() { return systemType::Android; }
