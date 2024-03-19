@@ -40,9 +40,9 @@ void AndroidGraphics::init(JNIEnv *env, jobject instance, jobject surface) {
                                        EGL_DEPTH_SIZE,
                                        8,
                                        EGL_STENCIL_SIZE,
-                                       8,  // 眼睛屏幕的距离
+                                       8, // 眼睛屏幕的距离
                                        EGL_RENDERABLE_TYPE,
-                                       EGL_OPENGL_ES2_BIT,  // 版本号
+                                       EGL_OPENGL_ES2_BIT, // 版本号
                                        EGL_NONE};
 
   // 3.1
@@ -114,6 +114,8 @@ void AndroidGraphics::swapBuffers() {
       eglSwapBuffers(mEglDisplay, mEglSurface)) {
   }
 }
-void AndroidGraphics::run() {}
 GLVersion AndroidGraphics::getGLVersion() { return glVersion; }
-}  // namespace nova
+void AndroidGraphics::update() {}
+void AndroidGraphics::create_window() {}
+void AndroidGraphics::dispose() {}
+} // namespace nova

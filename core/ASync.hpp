@@ -1,25 +1,29 @@
 #pragma once
+#include "concepts"
+#include "source_location"
 #include <any>
 #include <chrono>
 #include <exception>
 #include <functional>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <queue>
+#include <string>
 #include <type_traits>
+#include <typeindex>
 #include <typeinfo>
-
-#include "concepts"
-#include "source_location"
+#include <utility>
+#include <vector>
 namespace nova {
 namespace async {
 enum class TaskState { finish, error, running, unPost, waiting };
 class Context;
 class Basic_Task {
- protected:
+protected:
   Context *context;
 
- public:
+public:
   TaskState state = TaskState::unPost;
   virtual const std::type_info &taskType() = 0;
   virtual void run() = 0;
@@ -34,10 +38,10 @@ class Basic_Task {
                               std::source_location::current()) = 0;
 };
 class Runnable_Task : public Basic_Task {
- private:
+private:
   bool stopped = false;
 
- public:
+public:
   using runnable_function = std::function<void(Context *, Runnable_Task *)>;
   runnable_function runnable;
   using return_post_type = Runnable_Task *;
@@ -57,10 +61,10 @@ class Runnable_Task : public Basic_Task {
   Runnable_Task(runnable_function);
 };
 class WhileUtilTask : public Basic_Task {
- private:
+private:
   bool stopped = false;
 
- public:
+public:
   using runnable_function = std::function<void(Context *, WhileUtilTask *)>;
   using bool_function = std::function<bool(Context *, WhileUtilTask *)>;
   runnable_function runnable;
@@ -82,26 +86,25 @@ class WhileUtilTask : public Basic_Task {
   WhileUtilTask(runnable_function, bool_function);
 };
 
-template <typename Return>
-class Promise {
+template <typename Return> class Promise {
   class Promise_Return {
-   private:
+  private:
     Promise<Return> *promise;
   };
 };
 class Timer : public Basic_Task {
- public:
+public:
   using runnable_function = std::function<void(Context *, Timer *, int)>;
   using return_post_type = Timer *;
 
- private:
+private:
   runnable_function func;
   std::chrono::milliseconds delay, interval;
   int repeatCount, times;
   std::chrono::steady_clock::time_point lastRun;
   bool stopped = false;
 
- public:
+public:
   int getRepactCount();
   int getRunTimes();
   std::chrono::milliseconds getInterval();
@@ -131,11 +134,11 @@ concept Task_Type = requires(T t) {
   std::is_base_of_v<Basic_Task, T>;
 };
 class Context {
- protected:
+protected:
   std::queue<std::shared_ptr<Basic_Task>> taskList;
   std::mutex task_list_mutex;
 
- public:
+public:
   bool isEmpty();
   void onError(std::exception *exception, Basic_Task *,
                std::source_location source_location);
@@ -150,5 +153,45 @@ class Context {
   }
 };
 
-}  // namespace async
-}  // namespace nova
+} // namespace async
+// Events
+template <typename T>
+concept EnumType = std::is_enum<T>();
+template <typename T, typename... Args>
+concept InitilazeAble =
+    requires(T t, Args &&...args) { T(std::forward<Args>(args)...); };
+class Events {
+private:
+  static std::map<std::type_index, std::vector<std::any>> events;
+  static std::map<std::string, std::vector<std::function<void()>>> enums;
+
+public:
+  template <EnumType E, E V> static std::string getEnumHash() {
+    return __PRETTY_FUNCTION__;
+  }
+  template <typename T> void static on(std::function<void(T)> func) {
+    events[typeid(T)].push_back(func);
+  }
+  template <EnumType T> void static run(std::function<void()> func) {
+    enums[getEnumHash<T>()].push_back(func);
+  }
+  template <typename T> void static fire_(T event) {
+    for (auto f : events[typeid(T)]) {
+      std::any_cast<std::function<void(T)>>(f)(event);
+    }
+  }
+  template <typename T, typename... Args> void static fire(Args... args) {
+    fire_<T>(T(std::forward<Args>(args)...));
+  }
+  template <EnumType T> static void fireEnum() {
+    for (auto f : enums[getEnumHash<T>()]) {
+      std::any_cast<std::function<void()>>(f)();
+    }
+  }
+  static void clear();
+};
+struct sigInt {
+  int signum;
+  sigInt(int signum);
+};
+} // namespace nova

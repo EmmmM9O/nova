@@ -4,7 +4,9 @@
 #include <memory>
 #include <string>
 
+#include "android/AndroidGraphics.hpp"
 #include "android/native_window_jni.h"
+#include "core/Core.hpp"
 #include "core/Log.hpp"
 #include "core/Threads.hpp"
 #include "core/application.hpp"
@@ -23,7 +25,9 @@ void callBackOnDraw() {
   glClear(GL_COLOR_BUFFER_BIT);
 }
 bool AndroidApplication::running() { return true; }
-AndroidApplication::AndroidApplication() {}
+AndroidApplication::AndroidApplication() : graphics(new AndroidGraphics) {
+  nova::Core::graphics = graphics;
+}
 runType AndroidApplication::getType() { return runType::Desktop; }
 systemType AndroidApplication::getSystem() { return systemType::Android; }
 void AndroidApplication::initialize(
@@ -261,4 +265,4 @@ long AndroidApplication::getMaxMemory() {
   long res = env->CallLongMethod(coreActivity, javaMethod);
   return res;
 }
-}  // namespace nova
+} // namespace nova

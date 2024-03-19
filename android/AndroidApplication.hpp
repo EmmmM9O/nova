@@ -4,17 +4,19 @@
 #include <memory>
 #include <string>
 
+#include "android/AndroidGraphics.hpp"
 #include "core/application.hpp"
 #include "egl/EglThread.h"
 #include "jni.h"
 namespace nova {
 struct AndroidApplicationConfiguration {};
 class AndroidApplication : public Application {
- protected:
+protected:
   listenersType listeners;
   std::filesystem::path filesDir;
+  std::shared_ptr<AndroidGraphics> graphics;
 
- public:
+public:
   std::shared_ptr<EglThread> eglThread = NULL;
   JavaVM *javaVM;
   jobject coreActivity, coreView;
@@ -46,4 +48,4 @@ class AndroidApplication : public Application {
   long getMaxMemory() override;
   bool running() override;
 };
-}  // namespace nova
+} // namespace nova

@@ -10,12 +10,12 @@ int main() {
   Log_info("example : {}", "async");
   nova::async::Context context;
   auto timer = context.post(nova::async::Timer(
-      [](nova::async::Context *, nova::async::Timer *, int times) -> void {
+      [](auto, auto, int times) -> void {
         std::cout << "1 s timer :" << times << std::endl;
       },
       std::chrono::milliseconds(0), std::chrono::milliseconds(1000), 10));
   context.post(nova::async::Timer(
-      [timer](nova::async::Context *, nova::async::Timer *, int times) -> void {
+      [timer](auto, auto, int times) -> void {
         std::cout << "2 s timer :" << times << std::endl;
         if (times == 3) {
           timer->cancel();

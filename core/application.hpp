@@ -5,16 +5,17 @@
 #include <string>
 #include <vector>
 
+#include "core/ASync.hpp"
 #include "function.hpp"
 namespace nova {
 enum class systemType { Android, Linux, Window, Undefined };
 enum class runType { Desktop, Headless };
 class Disposable {
- public:
+public:
   virtual void dispose() = 0;
 };
 class ApplicationListener {
- public:
+public:
   virtual void init() = 0;
   virtual void resize(int width, int height) = 0;
   virtual void update() = 0;
@@ -26,10 +27,11 @@ class ApplicationListener {
 };
 typedef std::vector<std::shared_ptr<ApplicationListener>> listenersType;
 class Application : public Disposable {
- protected:
+protected:
   static std::mutex mt;
 
- public:
+public:
+  async::Context asyncContext;
   virtual bool running() = 0;
   virtual listenersType &getListeners() = 0;
   virtual void addListener(std::shared_ptr<ApplicationListener> listener);
@@ -56,10 +58,10 @@ class Application : public Disposable {
   virtual long getMaxMemory();
 };
 class ApplicationCore : public ApplicationListener {
- protected:
+protected:
   listenersType modules;
 
- public:
+public:
   void add(std::shared_ptr<ApplicationListener> module);
   virtual void setup() = 0;
   void init() override;
@@ -70,4 +72,4 @@ class ApplicationCore : public ApplicationListener {
   void dispose() override;
   void fileDropped(std::filesystem::path file) override;
 };
-}  // namespace nova
+} // namespace nova

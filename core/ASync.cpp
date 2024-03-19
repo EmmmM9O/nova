@@ -56,7 +56,8 @@ Runnable_Task::return_post_type Runnable_Task::return_post() { return this; }
 std::any Runnable_Task::return_post_any() { return return_post(); }
 void Runnable_Task::run() { runnable(context, this); }
 bool Runnable_Task::stop() {
-  if (stopped || state != TaskState::waiting) return false;
+  if (stopped || state != TaskState::waiting)
+    return false;
   stopped = true;
   return true;
 }
@@ -83,7 +84,8 @@ const std::type_info &WhileUtilTask::taskType() {
 void WhileUtilTask::init(Context *c) { this->context = c; }
 void WhileUtilTask::run() { runnable(context, this); }
 bool WhileUtilTask::stop() {
-  if (stopped) return false;
+  if (stopped)
+    return false;
   stopped = true;
   return true;
 }
@@ -106,7 +108,8 @@ int Timer::getRunTimes() { return times; }
 std::chrono::milliseconds Timer::getInterval() { return interval; }
 std::chrono::milliseconds Timer::getDelay() { return delay; }
 bool Timer::cancel() {
-  if (stopped) return false;
+  if (stopped)
+    return false;
   stopped = true;
   return true;
 }
@@ -133,13 +136,13 @@ const std::type_info &Timer::taskType() { return typeid(Timer); }
 Timer::return_post_type Timer::return_post() { return this; }
 Timer::Timer(runnable_function func, std::chrono::milliseconds delay,
              std::chrono::milliseconds interval, int repeatCount)
-    : func(func),
-      delay(delay),
-      interval(interval),
-      repeatCount(repeatCount),
+    : func(func), delay(delay), interval(interval), repeatCount(repeatCount),
       times(1) {
   lastRun = std::chrono::steady_clock::now();
 }
 
-}  // namespace async
-}  // namespace nova
+} // namespace async
+void Events::clear() { events.clear(); }
+std::map<std::type_index, std::vector<std::any>> Events::events;
+std::map<std::string, std::vector<std::function<void()>>> Events::enums;
+} // namespace nova
