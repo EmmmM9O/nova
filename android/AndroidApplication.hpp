@@ -14,10 +14,9 @@ class AndroidApplication : public Application {
 protected:
   listenersType listeners;
   std::filesystem::path filesDir;
-  std::shared_ptr<AndroidGraphics> graphics;
+  AndroidGraphics graphics;
 
 public:
-  std::shared_ptr<EglThread> eglThread = NULL;
   JavaVM *javaVM;
   jobject coreActivity, coreView;
   void initialize(JNIEnv *env, jobject activity,

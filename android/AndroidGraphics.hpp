@@ -10,6 +10,7 @@ protected:
   EGLContext mEglContext;
   EGLSurface mEglSurface;
   ANativeWindow *mANativeWindow = nullptr;
+  bool running_b = false;
 
 public:
   GLVersion glVersion;
@@ -20,6 +21,8 @@ public:
   void update() override;
   void create_window() override;
   void dispose() override;
+  void change_surface(int width, int height) override;
   void swapBuffers();
+  bool running() override;
 };
 } // namespace nova

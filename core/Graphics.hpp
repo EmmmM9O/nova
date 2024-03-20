@@ -38,6 +38,8 @@ public:
   virtual void create_window() = 0;
   virtual void update() = 0;
   virtual void destory() = 0;
+  virtual void change_surface(int width, int height) = 0;
+  virtual bool running() = 0;
 };
 } // namespace nova
 template <> struct fmt::formatter<nova::GlType> : formatter<string_view> {

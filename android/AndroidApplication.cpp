@@ -3,30 +3,20 @@
 #include <filesystem>
 #include <memory>
 #include <string>
+#include <thread>
 
 #include "android/AndroidGraphics.hpp"
-#include "android/native_window_jni.h"
 #include "core/Core.hpp"
 #include "core/Log.hpp"
 #include "core/Threads.hpp"
 #include "core/application.hpp"
-#include "egl/EglThread.h"
 #include "jni.h"
 #include "log/JniLog.h"
 namespace nova {
-void callBackOnCreate() {}
 
-void callBackOnChange(int width, int height) {
-  glViewport(0, 0, width, height);
-}
-
-void callBackOnDraw() {
-  glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
-}
 bool AndroidApplication::running() { return true; }
-AndroidApplication::AndroidApplication() : graphics(new AndroidGraphics) {
-  nova::Core::graphics = graphics;
+AndroidApplication::AndroidApplication() : graphics() {
+  nova::Core::graphics = &graphics;
 }
 runType AndroidApplication::getType() { return runType::Desktop; }
 systemType AndroidApplication::getSystem() { return systemType::Android; }
@@ -45,26 +35,18 @@ void AndroidApplication::initialize(
 void AndroidApplication::createSurcafe(JNIEnv *env, jobject view,
                                        jobject surface) {
   coreView = env->NewGlobalRef(view);
-  eglThread = std::shared_ptr<EglThread>(new EglThread());
-  eglThread->callBackOnCreate(callBackOnCreate);
-  eglThread->callBackOnChange(callBackOnChange);
-  eglThread->callBackOnDraw(callBackOnDraw);
-  eglThread->setRenderModule(RENDER_MODULE_MANUAL);
-
-  ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env, surface);
-  eglThread->onSurfaceCreate(nativeWindow);
+  graphics.init(env, view, surface);
+  std::thread thread([this]() -> void {
+    });
+  thread.detach();
 }
 void AndroidApplication::surfaceChange(JNIEnv *env, jobject instance,
                                        jint width, jint height) {
-  if (eglThread) {
-    eglThread->onSurfaceChange(width, height);
-  }
+  graphics.change_surface(width, height);
 }
 void AndroidApplication::surfaceDestory(JNIEnv *env, jobject instance) {
-  if (eglThread) {
-    eglThread->isExit = true;
-    pthread_join(eglThread->mEglThread, NULL);
-  }
+  graphics.destory();
+  graphics.dispose();
 }
 int32_t AndroidApplication::getVersion() {
   JNIEnv *env;

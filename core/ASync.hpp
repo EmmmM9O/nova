@@ -85,12 +85,49 @@ public:
   return_post_type return_post();
   WhileUtilTask(runnable_function, bool_function);
 };
+template <typename Return, typename Error> class Promise;
+template <typename Return, typename Error> class Promise_Return {
+public:
+  using resolve_function = std::function<void(Return, Context *)>;
+  using reject_function =
+      std::function<void(Error, std::source_location, Context *)>;
+  using finish_function = std::function<void(Context *)>;
+  resolve_function resolve_function_;
+  reject_function reject_function_;
+  finish_function finish_function_;
+  Promise_Return();
+  Promise_Return<Return, Error> Then(resolve_function);
+  Promise_Return<Return, Error> Catch(resolve_function);
+  Promise_Return<Return, Error> Finally(resolve_function);
+};
 
-template <typename Return> class Promise {
-  class Promise_Return {
-  private:
-    Promise<Return> *promise;
-  };
+template <typename Return, typename Error> class Promise_Helper {
+public:
+  Promise_Return<Return, Error> return_promise;
+  Context *context;
+  Promise<Return, Error> *promise;
+  Promise_Helper<Return, Error>(Context *, Promise<Return, Error> *);
+  void resolve(Return res);
+  void reject(Error err);
+};
+template <typename Return, typename Error> class Promise : public Basic_Task {
+public:
+  using promise_function =
+      std::function<void(Context *, Promise *, Promise_Helper<Return, Error>)>;
+  using return_post_type = Promise_Helper<Return, Error>;
+  const std::type_info &taskType() override final;
+  std::shared_ptr<return_post_type> return_promise;
+  void init(Context *) override final;
+  void run() override final;
+  bool if_run() override final;
+  bool if_delete() override final;
+  void on_destroy() override final;
+  void finish() override final;
+  void throwError(Error error,
+                  std::source_location source_location =
+                      std::source_location::current()) override final;
+  std::any return_post_any() override final;
+  return_post_type return_post();
 };
 class Timer : public Basic_Task {
 public:
@@ -127,6 +164,8 @@ public:
         std::chrono::milliseconds interval = std::chrono::milliseconds(1000),
         int repeatCount = 1);
 };
+// Promise
+
 template <typename T>
 concept Task_Type = requires(T t) {
   typename T::return_post_type;
@@ -157,9 +196,7 @@ public:
 // Events
 template <typename T>
 concept EnumType = std::is_enum<T>();
-template <typename T, typename... Args>
-concept InitilazeAble =
-    requires(T t, Args &&...args) { T(std::forward<Args>(args)...); };
+
 class Events {
 private:
   static std::map<std::type_index, std::vector<std::any>> events;
@@ -181,6 +218,8 @@ public:
     }
   }
   template <typename T, typename... Args> void static fire(Args... args) {
+    static_assert(std::is_constructible<T, Args...>::value,
+                  "T must be able to constuct from Args...");
     fire_<T>(T(std::forward<Args>(args)...));
   }
   template <EnumType T> static void fireEnum() {

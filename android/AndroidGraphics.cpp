@@ -86,8 +86,10 @@ void AndroidGraphics::init(JNIEnv *env, jobject instance, jobject surface) {
                       reinterpret_cast<const char *>(glGetString(GL_RENDERER)),
                       reinterpret_cast<const char *>(glGetString(GL_VERSION)));
   // 7. 刷新数据，显示渲染场景 -- eglSwapBuffers
+  running_b = true;
 }
 void AndroidGraphics::destory() {
+  running_b = false;
   if (mEglDisplay != EGL_NO_DISPLAY) {
     // 解绑display上的eglContext和surface
     eglMakeCurrent(mEglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
@@ -115,7 +117,15 @@ void AndroidGraphics::swapBuffers() {
   }
 }
 GLVersion AndroidGraphics::getGLVersion() { return glVersion; }
-void AndroidGraphics::update() {}
+void AndroidGraphics::update() {
+  glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+  swapBuffers();
+}
 void AndroidGraphics::create_window() {}
 void AndroidGraphics::dispose() {}
+void AndroidGraphics::change_surface(int width, int height) {
+  glViewport(0, 0, width, height);
+}
+bool AndroidGraphics::running() { return running_b; }
 } // namespace nova
