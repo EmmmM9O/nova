@@ -14,9 +14,10 @@
 #include "log/JniLog.h"
 namespace nova {
 
-bool AndroidApplication::running() { return true; }
-AndroidApplication::AndroidApplication() : graphics() {
+bool AndroidApplication::running() { return running_; }
+AndroidApplication::AndroidApplication() : graphics(), context() {
   nova::Core::graphics = &graphics;
+  nova::Core::context = &context;
 }
 runType AndroidApplication::getType() { return runType::Desktop; }
 systemType AndroidApplication::getSystem() { return systemType::Android; }
@@ -30,14 +31,20 @@ void AndroidApplication::initialize(
   logJava("jni" + str);
   filesDir = std::filesystem::path(str);
   Log::my_logger.logDir = filesDir / "logs";
+  Log_info("setup log:{}", Log::my_logger.logDir.string());
   addListener(listener);
 }
 void AndroidApplication::createSurcafe(JNIEnv *env, jobject view,
                                        jobject surface) {
   coreView = env->NewGlobalRef(view);
   graphics.init(env, view, surface);
+  Log_info("{}", graphics.getGLVersion());
+  graphics.setupTask();
   std::thread thread([this]() -> void {
-    });
+    while (running()) {
+      context.run_once();
+    }
+  });
   thread.detach();
 }
 void AndroidApplication::surfaceChange(JNIEnv *env, jobject instance,
@@ -45,6 +52,7 @@ void AndroidApplication::surfaceChange(JNIEnv *env, jobject instance,
   graphics.change_surface(width, height);
 }
 void AndroidApplication::surfaceDestory(JNIEnv *env, jobject instance) {
+  running_ = false;
   graphics.destory();
   graphics.dispose();
 }
@@ -199,6 +207,7 @@ void AndroidApplication::exit() {
     return;
   }
   env->CallVoidMethod(coreActivity, javaMethod);
+  running_ = false;
 }
 
 void AndroidApplication::post(Runnable runnable) {
@@ -247,4 +256,4 @@ long AndroidApplication::getMaxMemory() {
   long res = env->CallLongMethod(coreActivity, javaMethod);
   return res;
 }
-} // namespace nova
+}  // namespace nova

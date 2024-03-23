@@ -20,13 +20,12 @@ void handleSignal(int signum) {
   Log_error("waiting app exit {}", "...");
   if (nova::Core::app->running()) {
   }
-  nova::Core::app.reset();
 }
 int main() {
   signal(SIGINT, handleSignal);
   nova::DesktopConfig config{.width = 900, .height = 700, .title = "Nova"};
-  nova::Core::app = std::shared_ptr<nova::Application>(
-      new nova::DesktopApplication(p, config));
+  nova::DesktopApplication dapp(p, config);
+  nova::Core::app = &dapp;
   Log_info("window {}", "end");
   return 0;
 }

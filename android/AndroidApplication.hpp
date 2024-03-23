@@ -5,18 +5,20 @@
 #include <string>
 
 #include "android/AndroidGraphics.hpp"
+#include "core/ASync.hpp"
 #include "core/application.hpp"
-#include "egl/EglThread.h"
 #include "jni.h"
 namespace nova {
 struct AndroidApplicationConfiguration {};
 class AndroidApplication : public Application {
-protected:
+ protected:
   listenersType listeners;
   std::filesystem::path filesDir;
   AndroidGraphics graphics;
+  async::Context context;
+  bool running_ = true;
 
-public:
+ public:
   JavaVM *javaVM;
   jobject coreActivity, coreView;
   void initialize(JNIEnv *env, jobject activity,
@@ -47,4 +49,4 @@ public:
   long getMaxMemory() override;
   bool running() override;
 };
-} // namespace nova
+}  // namespace nova

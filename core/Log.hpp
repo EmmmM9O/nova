@@ -78,18 +78,22 @@ template <>
 struct fmt::formatter<nova::LogLevel> : formatter<string_view> {
   auto format(nova::LogLevel level, format_context &ctx) const;
 };
-#define Log_log(level, format, ...)                                        \
-  nova::Log::my_logger.log(std::source_location::current(), level, format, \
-                           __VA_ARGS__)
+#define Log_log(level, format, ...)                                \
+  nova::Log::my_logger.log(std::source_location::current(), level, \
+                           format __VA_OPT__(, ) __VA_ARGS__)
 #define Log_info(format, ...)                               \
   nova::Log::my_logger.log(std::source_location::current(), \
-                           nova::LogLevel::Info, format, __VA_ARGS__)
+                           nova::LogLevel::Info,            \
+                           format __VA_OPT__(, ) __VA_ARGS__)
 #define Log_debug(format, ...)                              \
   nova::Log::my_logger.log(std::source_location::current(), \
-                           nova::LogLevel::Debug, format, __VA_ARGS__)
+                           nova::LogLevel::Debug,           \
+                           format __VA_OPT__(, ) __VA_ARGS__)
 #define Log_warn(format, ...)                               \
   nova::Log::my_logger.log(std::source_location::current(), \
-                           nova::LogLevel::Warn, format, __VA_ARGS__)
+                           nova::LogLevel::Warn,            \
+                           format __VA_OPT__(, ) __VA_ARGS__)
 #define Log_error(format, ...)                              \
   nova::Log::my_logger.log(std::source_location::current(), \
-                           nova::LogLevel::Error, format, __VA_ARGS__)
+                           nova::LogLevel::Error,           \
+                           format __VA_OPT__(, ) __VA_ARGS__)

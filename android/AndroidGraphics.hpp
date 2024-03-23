@@ -5,24 +5,23 @@
 #include "jni.h"
 namespace nova {
 class AndroidGraphics : public Graphics {
-protected:
+ protected:
   EGLDisplay mEglDisplay;
   EGLContext mEglContext;
   EGLSurface mEglSurface;
   ANativeWindow *mANativeWindow = nullptr;
   bool running_b = false;
 
-public:
+ public:
   GLVersion glVersion;
   AndroidGraphics();
   GLVersion getGLVersion() override;
   void init(JNIEnv *env, jobject instance, jobject surface);
   void destory() override;
   void update() override;
-  void create_window() override;
   void dispose() override;
   void change_surface(int width, int height) override;
   void swapBuffers();
   bool running() override;
 };
-} // namespace nova
+}  // namespace nova
