@@ -6,13 +6,74 @@
 
 #include <chrono>
 #include <regex>
+#include <sstream>
 #include <string>
-#include "core/Log.hpp"
+
 #include "core/ASync.hpp"
 #include "core/Core.hpp"
+#include "core/Log.hpp"
 #include "core/Util.hpp"
 #include "core/application.hpp"
 namespace nova {
+int Color::rgba8888() {
+  return ((int)(r * 255) << 24) | ((int)(g * 255) << 16) |
+         ((int)(b * 255) << 8) | (int)(a * 255);
+}
+int Color::rgba8888(float r, float g, float b, float a) {
+  return ((int)(r * 255) << 24) | ((int)(g * 255) << 16) |
+         ((int)(b * 255) << 8) | (int)(a * 255);
+}
+Color::Color(unsigned int rgba8888) {
+  r = ((rgba8888 & 0xff000000) >> 24) / 255.0f;
+  g = ((rgba8888 & 0x00ff0000) >> 16) / 255.0f;
+  b = ((rgba8888 & 0x0000ff00) >> 8) / 255.0f;
+  a = ((rgba8888 & 0x000000ff)) / 255.0f;
+}
+int Color::rgba() { return rgba8888(); }
+std::string Color::toString() {
+  std::stringstream ss;
+  ss << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(r)
+     << std::setw(2) << static_cast<int>(g) << std::setw(2)
+     << static_cast<int>(b) << std::setw(2) << static_cast<int>(a);
+  return ss.str();
+}
+Color::Color(std::string hex) {
+  std::istringstream iss(hex);
+  iss >> std::hex;
+  int tmp;
+  iss >> tmp;
+  r = tmp / 255.0f;
+  iss >> tmp;
+  g = tmp / 255.0f;
+  iss >> tmp;
+  b = tmp / 255.0f;
+  iss >> tmp;
+  a = tmp / 255.0f;
+}
+Color::Color(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {
+  clamp();
+}
+void Color::clamp() {
+  if (r < 0)
+    r = 0;
+  else if (r > 1)
+    r = 1;
+
+  if (g < 0)
+    g = 0;
+  else if (g > 1)
+    g = 1;
+
+  if (b < 0)
+    b = 0;
+  else if (b > 1)
+    b = 1;
+
+  if (a < 0)
+    a = 0;
+  else if (a > 1)
+    a = 1;
+}
 std::string to_string(GlType gl) {
   switch (gl) {
     case GlType::GLES:

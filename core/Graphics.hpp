@@ -2,6 +2,7 @@
 #include <fmt/core.h>
 
 #include <string>
+#include <string_view>
 
 #include "application.hpp"
 namespace nova {
@@ -9,8 +10,14 @@ class Color {
  public:
   float r, g, b, a;
   Color();
-  Color(int rgba8888);
+  Color(unsigned int rgba8888);
+  Color(std::string hex);
   Color(float r, float g, float b, float a);
+  void clamp();
+  int rgba8888();
+  int rgba();
+  static int rgba8888(float r, float g, float b, float a);
+  std::string toString();
 };
 
 enum class GlType { OpenGL, GLES, WebGL, NONE };
@@ -30,6 +37,16 @@ class GLVersion {
 
  private:
   void extractVersion(std::string patternString, std::string versionString);
+};
+class Batchr : public Disposable {
+ protected:
+  Color color = Color(1, 1, 1, 1);
+
+ public:
+  void dispose() override;
+  void setColor(Color color);
+  void setColor(float r, float g, float b, float a);
+  Color getColor();
 };
 std::string to_string(GLVersion gl);
 class Graphics : public Disposable {
