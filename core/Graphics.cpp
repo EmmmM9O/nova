@@ -2,11 +2,14 @@
 
 #include <fmt/core.h>
 #include <fmt/format.h>
+#include <unistd.h>
 
+#include <chrono>
 #include <regex>
 #include <string>
-
 #include "core/Log.hpp"
+#include "core/ASync.hpp"
+#include "core/Core.hpp"
 #include "core/Util.hpp"
 #include "core/application.hpp"
 namespace nova {
@@ -70,6 +73,17 @@ std::string GLVersion::toString() {
          " / " + vendorString + " / " + rendererString;
 }
 std::string to_string(GLVersion version) { return version.toString(); }
+void Graphics::setupTask() {
+  nova::Core::context->post(async::Timer(
+      [this](auto, async::Timer *timer, auto) -> void {
+        update();
+        if (!running()) {
+          timer->cancel();
+        }
+      },
+      0.0_asecond, std::chrono::milliseconds(17), -1));
+}
+
 }  // namespace nova
 auto fmt::formatter<nova::GlType>::format(nova::GlType obj,
                                           format_context &ctx) const {

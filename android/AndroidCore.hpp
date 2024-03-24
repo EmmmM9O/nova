@@ -2,6 +2,6 @@
 #include "AndroidApplication.hpp"
 namespace nova {
 namespace android {
-extern std::shared_ptr<nova::AndroidApplication> app;
+extern nova::AndroidApplication* app;
 }
 }  // namespace nova

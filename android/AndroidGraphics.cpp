@@ -2,9 +2,11 @@
 
 #include "EGL/egl.h"
 #include "EGL/eglplatform.h"
-#include "GLES3/gl3.h"
+#include "GLES2/gl2.h"
+#include "android/native_window.h"
 #include "android/native_window_jni.h"
 #include "core/Graphics.hpp"
+#include "core/Log.hpp"
 #include "core/application.hpp"
 #include "log/JniLog.h"
 namespace nova {
@@ -13,19 +15,19 @@ AndroidGraphics::AndroidGraphics() {
   mEglSurface = EGL_NO_SURFACE;
   mEglContext = EGL_NO_CONTEXT;
 }
-void AndroidGraphics::init(JNIEnv *env, jobject instance, jobject surface) {
-  mANativeWindow = ANativeWindow_fromSurface(env, surface);
+void AndroidGraphics::init(ANativeWindow* native_window) {
+  mANativeWindow = native_window;
   // 1.得到默认的显示设备（就是窗口） -- eglGetDisplay
   mEglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
   if (mEglDisplay == EGL_NO_DISPLAY) {
-    LOGE("eglGetDisplay error");
+    Log_error("eglGetDisplay error");
     return;
   }
 
   // 2. 初始化默认显示设备 -- eglInitialize
   EGLint majorVersion, minorVersion;
   if (!eglInitialize(mEglDisplay, &majorVersion, &minorVersion)) {
-    LOGE("eglInitialize error");
+    Log_error("eglInitialize error");
     return;
   }
   // 3. 设置显示设备的属性
@@ -50,14 +52,14 @@ void AndroidGraphics::init(JNIEnv *env, jobject instance, jobject surface) {
   EGLint num_config;
 
   if (!eglChooseConfig(mEglDisplay, attrib_config_list, NULL, 1, &num_config)) {
-    LOGE("eglChooseConfig error");
+    Log_error("eglChooseConfig error");
     return;
   }
   // 3.2 根据获取到的config_size得到eglConfig
   EGLConfig eglConfig;
   if (!eglChooseConfig(mEglDisplay, attrib_config_list, &eglConfig, num_config,
                        &num_config)) {
-    LOGE("eglChooseConfig error");
+    Log_error("eglChooseConfig error");
     return;
   }
 
@@ -65,19 +67,19 @@ void AndroidGraphics::init(JNIEnv *env, jobject instance, jobject surface) {
   const EGLint attrib_ctx_list[] = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE};
   mEglContext = eglCreateContext(mEglDisplay, eglConfig, NULL, attrib_ctx_list);
   if (mEglContext == EGL_NO_CONTEXT) {
-    LOGE("eglCreateContext  error");
+    Log_error("eglCreateContext  error");
     return;
   }
   // 5.创建渲染的surface
   mEglSurface =
       eglCreateWindowSurface(mEglDisplay, eglConfig, mANativeWindow, NULL);
   if (mEglSurface == EGL_NO_SURFACE) {
-    LOGE("eglCreateWindowSurface  error");
+    Log_error("eglCreateWindowSurface  error");
     return;
   }
   // 6. 绑定eglContext和surface到display
   if (!eglMakeCurrent(mEglDisplay, mEglSurface, mEglSurface, mEglContext)) {
-    LOGE("eglMakeCurrent  error");
+    Log_error("eglMakeCurrent  error");
     return;
   }
   glVersion =

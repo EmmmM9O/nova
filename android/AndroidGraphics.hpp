@@ -1,7 +1,7 @@
 #pragma once
 #include "EGL/egl.h"
+#include "EGL/eglplatform.h"
 #include "core/Graphics.hpp"
-#include "core/application.hpp"
 #include "jni.h"
 namespace nova {
 class AndroidGraphics : public Graphics {
@@ -16,7 +16,7 @@ class AndroidGraphics : public Graphics {
   GLVersion glVersion;
   AndroidGraphics();
   GLVersion getGLVersion() override;
-  void init(JNIEnv *env, jobject instance, jobject surface);
+  void init(ANativeWindow *window);
   void destory() override;
   void update() override;
   void dispose() override;

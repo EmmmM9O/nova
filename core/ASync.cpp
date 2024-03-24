@@ -114,15 +114,17 @@ bool Timer::cancel() {
 void Timer::init(Context *c) { this->context = c; }
 void Timer::run() { func(context, this, times); }
 bool Timer::if_run() {
-  return (!stopped) && (times <= repeatCount) &&
+  return (!stopped) && ((times <= repeatCount) || repeatCount < 0) &&
          (times == 1
               ? ((std::chrono::steady_clock::now() - lastRun) >= delay)
               : ((std::chrono::steady_clock::now() - lastRun) >= interval));
 }
-bool Timer::if_delete() { return (stopped) || (times > repeatCount); }
+bool Timer::if_delete() {
+  return (stopped) || ((times > repeatCount) && ( repeatCount>= 0));
+}
 void Timer::on_destroy() {}
 void Timer::finish() {
-  times++;
+  if(repeatCount>=0) times++;
   lastRun = std::chrono::steady_clock::now();
 }
 std::any Timer::return_post_any() { return return_post(); }
@@ -159,7 +161,6 @@ Promise_Helper<Return,Error>
  template <typename Return, typename Error>
 Promise_Return<Return,Error>
 */
-
 
 }  // namespace async
 void Events::clear() { events.clear(); }

@@ -3,8 +3,11 @@
 #include <filesystem>
 #include <memory>
 #include <string>
+#include <thread>
 
 #include "android/AndroidGraphics.hpp"
+#include "android/egl/EglThread.h"
+#include "android/native_window.h"
 #include "core/ASync.hpp"
 #include "core/application.hpp"
 #include "jni.h"
@@ -16,7 +19,10 @@ class AndroidApplication : public Application {
   std::filesystem::path filesDir;
   AndroidGraphics graphics;
   async::Context context;
+  std::thread ContextThread;
+
   bool running_ = true;
+  ANativeWindow *window;
 
  public:
   JavaVM *javaVM;

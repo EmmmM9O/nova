@@ -125,7 +125,7 @@ class Promise_Return {
   resolve_function resolve_function_;
   reject_function reject_function_;
   finish_function finish_function_;
-  Promise_Return(){}
+  Promise_Return() {}
   Promise_Return<Return, Error> *Then(resolve_function func) {
     this->resolve_function_ = func;
     return this;
@@ -169,10 +169,11 @@ class Promise_Helper {
 template <typename Return, typename Error>
 class Promise : public Basic_Task {
  public:
-  using promise_function = std::function<void(
-      Context *, Promise<Return,Error> *, std::shared_ptr<Promise_Helper<Return, Error>>)>;
+  using promise_function =
+      std::function<void(Context *, Promise<Return, Error> *,
+                         std::shared_ptr<Promise_Helper<Return, Error>>)>;
   promise_function function;
-  using return_post_type = Promise_Return<Return, Error>*;
+  using return_post_type = Promise_Return<Return, Error> *;
   using helper_post_type = Promise_Helper<Return, Error>;
   const std::type_info &taskType() override final {
     return typeid(Promise<Return, Error>);
@@ -180,7 +181,7 @@ class Promise : public Basic_Task {
   std::shared_ptr<Promise_Helper<Return, Error>> helper_promise;
   void init(Context *c) override final {
     context = c;
-    helper_promise = std::make_shared<Promise_Helper<Return,Error>>(c);
+    helper_promise = std::make_shared<Promise_Helper<Return, Error>>(c);
   }
   void run() override final { function(context, this, helper_promise); }
   bool if_run() override final { return true; }

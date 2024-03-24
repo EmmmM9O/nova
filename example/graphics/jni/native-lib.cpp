@@ -2,19 +2,15 @@
 
 #include <memory>
 
-#include "AndroidApplication.hpp"
-#include "AndroidCore.hpp"
-#include "core/Log.hpp"
+#include "android/AndroidApplication.hpp"
 #include "nova_example_NativeAndroidApplication.h"
-#include "source_location"
-std::shared_ptr<nova::AndroidApplication> nova::android::app =
-    std::make_shared<AndroidApplication>(nova::AndroidApplication());
+nova::AndroidApplication androidApp;
 JNIEXPORT void JNICALL
 Java_nova_example_NativeAndroidApplication_nativeSurfaceCreate(JNIEnv *env,
                                                                jclass,
                                                                jobject surface,
                                                                jobject view) {
-  nova::android::app->createSurcafe(env, view, surface);
+  androidApp.createSurcafe(env, view, surface);
 }
 /*
  * Class:     nova_example_NativeAndroidApplication
@@ -24,7 +20,7 @@ Java_nova_example_NativeAndroidApplication_nativeSurfaceCreate(JNIEnv *env,
 JNIEXPORT void JNICALL
 Java_nova_example_NativeAndroidApplication_nativeSurfaceChanged(
     JNIEnv *env, jclass, jint width, jint height, jobject view) {
-  nova::android::app->surfaceChange(env, view, width, height);
+  androidApp.surfaceChange(env, view, width, height);
 }
 
 /*
@@ -35,7 +31,7 @@ Java_nova_example_NativeAndroidApplication_nativeSurfaceChanged(
 JNIEXPORT void JNICALL
 Java_nova_example_NativeAndroidApplication_nativeSurfaceDestroyed(
     JNIEnv *env, jclass, jobject view) {
-  nova::android::app->surfaceDestory(env, view);
+  androidApp.surfaceDestory(env, view);
 }
 
 /*
@@ -45,13 +41,9 @@ Java_nova_example_NativeAndroidApplication_nativeSurfaceDestroyed(
  */
 JNIEXPORT void JNICALL Java_nova_example_NativeAndroidApplication_initJNI(
     JNIEnv *env, jclass, jobject activity) {
-  nova::android::app->initialize(env, activity, nullptr, {});
-  nova::Log::my_logger.log(std::source_location::current(),
-                           nova::LogLevel::Info, "sdk version {}",
-                           nova::android::app->getVersion());
+  androidApp.initialize(env, activity, nullptr, {});
 }
 JNIEXPORT void JNICALL Java_nova_example_NativeAndroidApplication_onDestory(
     JNIEnv *env, jclass, jobject activity) {
-  nova::android::app->onDestroy(env, activity);
-  nova::android::app.reset();
+  androidApp.onDestroy(env, activity);
 }

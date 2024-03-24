@@ -5,8 +5,12 @@
 #include <string>
 #include <thread>
 
+#include "AndroidCore.hpp"
 #include "android/AndroidGraphics.hpp"
+#include "android/native_window.h"
+#include "android/native_window_jni.h"
 #include "core/Core.hpp"
+#include "core/Graphics.hpp"
 #include "core/Log.hpp"
 #include "core/Threads.hpp"
 #include "core/application.hpp"
@@ -16,6 +20,8 @@ namespace nova {
 
 bool AndroidApplication::running() { return running_; }
 AndroidApplication::AndroidApplication() : graphics(), context() {
+  nova::android::app = this;
+  nova::Core::app = this;
   nova::Core::graphics = &graphics;
   nova::Core::context = &context;
 }
@@ -32,20 +38,25 @@ void AndroidApplication::initialize(
   filesDir = std::filesystem::path(str);
   Log::my_logger.logDir = filesDir / "logs";
   Log_info("setup log:{}", Log::my_logger.logDir.string());
+  nova::Log::my_logger.log(std::source_location::current(),
+                           nova::LogLevel::Info, "sdk version {}",
+                           getVersion());
   addListener(listener);
 }
 void AndroidApplication::createSurcafe(JNIEnv *env, jobject view,
                                        jobject surface) {
   coreView = env->NewGlobalRef(view);
-  graphics.init(env, view, surface);
-  Log_info("{}", graphics.getGLVersion());
-  graphics.setupTask();
-  std::thread thread([this]() -> void {
+  window = ANativeWindow_fromSurface(env, surface);
+  //  graphics.setupTask();
+  ContextThread = std::thread([this]() -> void {
+    Log_info("setup async threads");
+    graphics.init(window);
+    Log_info("{}", to_string(graphics.getGLVersion()));
     while (running()) {
-      context.run_once();
+      graphics.update();
+      // nova::Core::context->run_once();
     }
   });
-  thread.detach();
 }
 void AndroidApplication::surfaceChange(JNIEnv *env, jobject instance,
                                        jint width, jint height) {
@@ -53,6 +64,7 @@ void AndroidApplication::surfaceChange(JNIEnv *env, jobject instance,
 }
 void AndroidApplication::surfaceDestory(JNIEnv *env, jobject instance) {
   running_ = false;
+  ContextThread.join();
   graphics.destory();
   graphics.dispose();
 }
