@@ -2,12 +2,11 @@
 #include <fmt/core.h>
 
 #include <string>
-#include <string_view>
 
 #include "application.hpp"
 namespace nova {
 class Color {
- public:
+public:
   float r, g, b, a;
   Color();
   Color(unsigned int rgba8888);
@@ -23,7 +22,7 @@ class Color {
 enum class GlType { OpenGL, GLES, WebGL, NONE };
 std::string to_string(GlType gl);
 class GLVersion {
- public:
+public:
   GLVersion();
   std::string vendorString;
   std::string rendererString;
@@ -35,22 +34,46 @@ class GLVersion {
   GLVersion(systemType appType, std::string vendorString,
             std::string rendererString, std::string versionString);
 
- private:
+private:
   void extractVersion(std::string patternString, std::string versionString);
 };
-class Batchr : public Disposable {
- protected:
+class GLTexture : public Disposable {
+public:
+  int glTarget;
+  int width, height;
+  void dispose() override;
+};
+class Texture : public GLTexture {};
+class TextureRegion {
+public:
+  Texture texture;
+  int width, height;
+  float u, v, u2, v2;
+  float scale = 1.0f;
+};
+class Mesh : public Disposable {
+public:
+  int vertexSize;
+};
+class Batch : public Disposable {
+protected:
   Color color = Color(1, 1, 1, 1);
+  float z;
+  Texture *lastTexture = nullptr;
+  bool apply;
 
- public:
+public:
   void dispose() override;
   void setColor(Color color);
   void setColor(float r, float g, float b, float a);
   Color getColor();
+  virtual void draw(TextureRegion region, float x, float y, float originX,
+                    float originY, float width, float height,
+                    float rotation) = 0;
 };
 std::string to_string(GLVersion gl);
 class Graphics : public Disposable {
- public:
+public:
   virtual GLVersion getGLVersion() = 0;
   virtual void update() = 0;
   virtual void destory() = 0;
@@ -58,12 +81,16 @@ class Graphics : public Disposable {
   virtual bool running() = 0;
   void setupTask();
 };
-}  // namespace nova
-template <>
-struct fmt::formatter<nova::GlType> : formatter<string_view> {
+class Draw {
+  static Color getColor();
+  static void color(Color color);
+  static void alpha(float alpha);
+};
+
+} // namespace nova
+template <> struct fmt::formatter<nova::GlType> : formatter<string_view> {
   auto format(nova::GlType type, format_context &ctx) const;
 };
-template <>
-struct fmt::formatter<nova::GLVersion> : formatter<string_view> {
+template <> struct fmt::formatter<nova::GLVersion> : formatter<string_view> {
   auto format(nova::GLVersion version, format_context &ctx) const;
 };

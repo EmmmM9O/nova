@@ -76,16 +76,16 @@ void Color::clamp() {
 }
 std::string to_string(GlType gl) {
   switch (gl) {
-    case GlType::GLES:
-      return "GLES";
-    case GlType::OpenGL:
-      return "OpenGL";
-    case GlType::WebGL:
-      return "WebGL";
-    case GlType::NONE:
-      return "NONE";
-    default:
-      return "NoGLType";
+  case GlType::GLES:
+    return "GLES";
+  case GlType::OpenGL:
+    return "OpenGL";
+  case GlType::WebGL:
+    return "WebGL";
+  case GlType::NONE:
+    return "NONE";
+  default:
+    return "NoGLType";
   }
 }
 GLVersion::GLVersion() {}
@@ -142,10 +142,10 @@ void Graphics::setupTask() {
           timer->cancel();
         }
       },
-      0.0_asecond, std::chrono::milliseconds(17), -1));
+      0.0_asecond, std::chrono::milliseconds(16), -1));
 }
 
-}  // namespace nova
+} // namespace nova
 auto fmt::formatter<nova::GlType>::format(nova::GlType obj,
                                           format_context &ctx) const {
   return formatter<string_view>::format(to_string(obj), ctx);

@@ -52,9 +52,9 @@ void AndroidApplication::createSurcafe(JNIEnv *env, jobject view,
     Log_info("setup async threads");
     graphics.init(window);
     Log_info("{}", to_string(graphics.getGLVersion()));
+    graphics.setupTask();
     while (running()) {
-      graphics.update();
-      // nova::Core::context->run_once();
+      nova::Core::context->run_once();
     }
   });
 }
@@ -268,4 +268,4 @@ long AndroidApplication::getMaxMemory() {
   long res = env->CallLongMethod(coreActivity, javaMethod);
   return res;
 }
-}  // namespace nova
+} // namespace nova
