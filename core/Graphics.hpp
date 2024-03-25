@@ -4,6 +4,7 @@
 #include <string>
 
 #include "application.hpp"
+#include "core/Math.hpp"
 namespace nova {
 class Color {
 public:
@@ -18,7 +19,11 @@ public:
   static int rgba8888(float r, float g, float b, float a);
   std::string toString();
 };
-
+namespace Colors {
+extern Color black, darkGray, gray, lightGray, white, clear;
+extern float whiteRgba,clearRgba,blackRgba;
+extern float blackFloatBits,clearFloatBits,whiteFloatBits;
+}
 enum class GlType { OpenGL, GLES, WebGL, NONE };
 std::string to_string(GlType gl);
 class GLVersion {
@@ -54,13 +59,35 @@ public:
 class Mesh : public Disposable {
 public:
   int vertexSize;
+  void dispose() override;
+};
+class Shader : public Disposable {
+  void dispose() override;
+};
+class Blending {
+public:
+  static Blending *disabled, additive, normal;
+  int src, dst, srcAlpha, dstAlpha;
+  virtual void apply();
+  Blending(int src, int dst, int srcAlpha, int dstAlpha);
+  Blending(int src, int dst);
 };
 class Batch : public Disposable {
 protected:
+  Mesh mesh;
   Color color = Color(1, 1, 1, 1);
   float z;
   Texture *lastTexture = nullptr;
+  Shader *shader, *customShader = nullptr;
+  bool ownsShader;
+  float mixColorPacked;
+  float colorPacked;
+  Color mixColor;
+
   bool apply;
+  bool sortAscending = true;
+  int idx = 0;
+  Mat transformMatrix, projectionMatrix, combinedMatrix;
 
 public:
   void dispose() override;
