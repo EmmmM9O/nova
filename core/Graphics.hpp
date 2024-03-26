@@ -2,9 +2,11 @@
 #include <fmt/core.h>
 
 #include <string>
+#include <vector>
 
 #include "application.hpp"
 #include "core/Math.hpp"
+#include "core/function.hpp"
 namespace nova {
 class Color {
 public:
@@ -21,9 +23,9 @@ public:
 };
 namespace Colors {
 extern Color black, darkGray, gray, lightGray, white, clear;
-extern float whiteRgba,clearRgba,blackRgba;
-extern float blackFloatBits,clearFloatBits,whiteFloatBits;
-}
+extern float whiteRgba, clearRgba, blackRgba;
+extern float blackFloatBits, clearFloatBits, whiteFloatBits;
+} // namespace Colors
 enum class GlType { OpenGL, GLES, WebGL, NONE };
 std::string to_string(GlType gl);
 class GLVersion {
@@ -62,6 +64,12 @@ public:
   void dispose() override;
 };
 class Shader : public Disposable {
+public:
+  static std::string positionAttribute, texcoordAttribute, mixColorAttribute,
+      colorAttribute, normalAttribute;
+  static bool pedantic;
+  static std::string prependVertexCode, prependFragmentCode;
+
   void dispose() override;
 };
 class Blending {
@@ -76,9 +84,9 @@ class Batch : public Disposable {
 protected:
   Mesh mesh;
   Color color = Color(1, 1, 1, 1);
-  float z;
+  float m_z;
   Texture *lastTexture = nullptr;
-  Shader *shader, *customShader = nullptr;
+  Shader shader, customShader;
   bool ownsShader;
   float mixColorPacked;
   float colorPacked;
@@ -90,6 +98,17 @@ protected:
   Mat transformMatrix, projectionMatrix, combinedMatrix;
 
 public:
+  void z(float z);
+  void setSort(bool sort);
+  void setSortAscending(bool ascend);
+  Color getMixColor();
+  void setMixColor(float r, float g, float b, float a);
+  void setMixColor(Color tint);
+  float getPackedColor();
+  void setPackedColor(float packedColor);
+  float getPackedMixColor();
+  void setPackedMixColor(float packedColor);
+
   void dispose() override;
   void setColor(Color color);
   void setColor(float r, float g, float b, float a);
@@ -97,7 +116,47 @@ public:
   virtual void draw(TextureRegion region, float x, float y, float originX,
                     float originY, float width, float height,
                     float rotation) = 0;
+  virtual void draw(Texture texture, float *spriteVertices, int offset,
+                    int count);
+  void draw(Runnable request);
+  virtual void flush();
+  void setBlending(Blending blending);
+  Blending getBlending();
+  void discard();
+  Mat getProjection();
+  Mat getTransform();
+  void setProjection(Mat projection);
+  void setTransform(Mat transform);
+  void setupMatrices();
+  Shader getShader();
+  void setShader(Shader shader, bool apply);
+  void setShader(Shader shader);
+  void switchTexture(Texture texture);
 };
+class SpriteBatch : public Batch {
+public:
+  static const int VERTEX_SIZE = 2 + 1 + 2 + 1;
+  static const int SPRITE_SIZE = 4 * VERTEX_SIZE;
+
+protected:
+  float *vertices;
+
+private:
+  int totalRenderCalls = 0;
+  int maxSpritesInBatch = 0;
+
+public:
+  SpriteBatch();
+  SpriteBatch(size_t size);
+  SpriteBatch(int size, Shader defaultShader);
+  void flush() override;
+  void draw(TextureRegion region, float x, float y, float originX,
+            float originY, float width, float height, float rotation) override;
+  void draw(Texture texture, float *spriteVertices, int offset,
+            int count) override;
+  static Shader createShader();
+};
+class SortedSpriteBatch : public SpriteBatch {};
 std::string to_string(GLVersion gl);
 class Graphics : public Disposable {
 public:
