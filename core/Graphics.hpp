@@ -1,4 +1,5 @@
 #pragma once
+#include <filesystem>
 #include <fmt/core.h>
 
 #include <string>
@@ -69,8 +70,47 @@ public:
       colorAttribute, normalAttribute;
   static bool pedantic;
   static std::string prependVertexCode, prependFragmentCode;
-
   void dispose() override;
+  Shader(std::string vertexShader, std::string fragmentShader);
+  Shader(std::filesystem::path vertexShader,
+         std::filesystem::path fragmentShader);
+  std::string getLog();
+  bool isCompiled();
+  int fetchUniformLocation(std::string name, bool pedantic);
+  void setUniformi(std::string name, int value);
+  void setUniformi(int location, int value);
+  void setUniformf(int location, float value);
+  void setUniformf(std::string name, float value);
+  void setUniformi(int location, int value1, int value2, int value3,
+                   int value4);
+  void setUniformi(std::string name, int value1, int value2, int value3,
+                   int value4);
+  void setUniformi(int location, int value1, int value2, int value3);
+  void setUniformi(std::string name, int value1, int value2, int value3);
+  void setUniformi(int location, int value1, int value2);
+  void setUniformi(std::string name, int value1, int value2);
+  void bind();
+  bool isDisposed();
+  void disableVertexAttribute(std::string name);
+
+protected:
+  std::string preprocess(std::string source, bool fragment);
+  int createProgram();
+
+private:
+  void fetchUniforms();
+    void fetchAttributes();
+  int fetchAttributeLocation(std::string name);
+  int fetchUniformLocation(std::string name);
+
+  int linkProgram(int program);
+  void compileShaders(std::string vertexShader, std::string fragmentShader);
+  int loadShader(int type, std::string source);
+  std::string fragmentShaderSource, vertexShaderSource;
+  bool _isCompiled, disposed;
+  std::string log = "";
+  int program, vertexShaderHandle, fragmentShaderHandle;
+  std::vector<std::string> uniformNames, attributeNames;
 };
 class Blending {
 public:
