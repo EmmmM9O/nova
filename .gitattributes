@@ -1,1 +1,4 @@
-third_party/* linguist-vendored
+third_party/* -linguist-vendored
+third_party/fmt/* -linguist-vendored
+third_party/fmt/src/* -linguist-vendored
+third_party/fmt/include/fmt/* -linguist-vendored
