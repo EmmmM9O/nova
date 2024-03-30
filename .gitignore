@@ -16,7 +16,7 @@
 *.dylib
 *.dll
 
-# Fortran module files
+# Fortran module filesando
 *.mod
 *.smod
 
@@ -30,3 +30,20 @@
 *.exe
 *.out
 *.app
+
+build/
+.xmake/
+
+.vscode
+
+*.log
+*.apk
+*.jks
+*.keystore
+temp/
+.clangd
+android/.clangd
+android/dist
+android/target
+*.class
+logs/
