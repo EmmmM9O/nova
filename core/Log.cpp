@@ -1,7 +1,7 @@
 #include "Log.hpp"
 
-#include <fmt/chrono.h>
 #include <fmt/core.h>
+#include <fmt/chrono.h>
 #include <fmt/format.h>
 
 #include <filesystem>
@@ -9,6 +9,7 @@
 #include <ios>
 #include <string>
 namespace nova {
+format_placeHolder placeholder;
 std::string to_string(LogLevel level) {
   switch (level) {
     case nova::LogLevel::Info:
@@ -71,20 +72,10 @@ auto fmt::formatter<nova::LogLevel>::format(nova::LogLevel level,
                                             format_context &ctx) const {
   return formatter<string_view>::format(nova::to_string(level), ctx);
 }
-constexpr auto fmt::formatter<nova::format_placeHolder>::parse(
-    format_parse_context &context) -> format_parse_context::iterator {
-  auto iter{context.begin()};
-  const auto end{context.end()};
-  place = "{";
-  while ((iter != end) && *iter != '}') {
-    place += *iter;
-    iter++;
-  }
-  place += "}";
-  return iter;
-}
-auto fmt::formatter<nova::format_placeHolder>::format(nova::format_placeHolder,
+
+auto fmt::formatter<nova::format_placeHolder>::format(const nova::format_placeHolder&,
                                                       format_context &ctx) const
-    -> format_context::iterator {
+-> format_context::iterator
+     {
   return fmt::format_to(ctx.out(), "{}", place);
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <fmt/core.h>
+#include <fmt/args.h>
 
 #include <filesystem>
 #include <source_location>
@@ -15,7 +16,7 @@ enum class LogLevel {
 };
 std::string to_string(LogLevel level);
 class format_placeHolder {};
-format_placeHolder placeholder;
+extern format_placeHolder placeholder;
 class logger {
  public:
   std::time_t time = std::time(nullptr);
@@ -34,10 +35,11 @@ class logger {
             std::string text);
   template <typename... Args>
   void log(const std::source_location &location, const LogLevel &level,
-           fmt::format_string<Args...> str, Args &&...args) {
-    _log(location, level,
-         fmt::vformat(str, fmt::make_format_args(fmt::arg("color", placeholder),
-                                                 args...)));
+           std::string str, Args &&...args) {
+    fmt::dynamic_format_arg_store<fmt::format_context> store;
+    ((store.push_back(args)), ...);
+    store.push_back(fmt::arg("color", placeholder));
+    _log(location, level, fmt::vformat(str, store));
   }
   std::string getFormatFle(LogLevel level);
   void writeFile(std::string str, LogLevel level);
@@ -73,7 +75,6 @@ class Log {
     log(location, LogLevel::Debug, str, args...);
   }
 };
-auto format_as(nova::LogLevel level) { return to_string(level); }
 }  // namespace nova
 //
 template <>
@@ -81,13 +82,22 @@ struct fmt::formatter<nova::LogLevel> : formatter<string_view> {
   auto format(nova::LogLevel level, format_context &ctx) const;
 };
 template <>
-struct fmt::formatter<nova::format_placeHolder> : formatter<std::string> {
-  constexpr auto parse(format_parse_context &ctx)
-      -> format_parse_context::iterator;
+class fmt::formatter<nova::format_placeHolder> {
+	public:
 
-  auto format(nova::format_placeHolder, format_context &ctx) const
-      -> format_context::iterator;
-
+  constexpr auto parse(format_parse_context &context) 
+  {
+  auto iter{context.begin()};
+  const auto end{context.end()};
+  place = "{";
+  while ((iter != end) && *iter != '}') {
+    place += *iter;
+    iter++;
+  }
+  place += "}";
+  return iter;
+}
+  auto format(const nova::format_placeHolder&, format_context &ctx) const -> format_context::iterator;
  private:
   std::string place;
 };
