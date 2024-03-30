@@ -2,3 +2,4 @@
 *.hpp linguist-language=cpp
 *.java linguist-language=java
 *.lua linguist-language=lua
+*.cc linguist-language=cpp
