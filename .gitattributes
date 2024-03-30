@@ -1,0 +1,4 @@
+*.cpp linguist-language=cpp
+*.hpp linguist-language=cpp
+*.java linguist-language=java
+*.lua linguist-language=lua
