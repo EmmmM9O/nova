@@ -1,0 +1,2 @@
+* linguist-language=Text
+*.lua linguist-language=lua
