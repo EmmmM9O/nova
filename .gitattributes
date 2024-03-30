@@ -1,5 +1,1 @@
-*.cpp linguist-language=cpp
-*.hpp linguist-language=cpp
-*.java linguist-language=java
-*.lua linguist-language=lua
-*.cc linguist-language=cpp
+third_party/* linguist-vendored
