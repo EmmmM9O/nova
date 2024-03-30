@@ -28,6 +28,7 @@ Color::Color(unsigned int rgba8888) {
   g = ((rgba8888 & 0x00ff0000) >> 16) / 255.0f;
   b = ((rgba8888 & 0x0000ff00) >> 8) / 255.0f;
   a = ((rgba8888 & 0x000000ff)) / 255.0f;
+  clamp();
 }
 int Color::rgba() { return rgba8888(); }
 std::string Color::toString() {
@@ -38,6 +39,9 @@ std::string Color::toString() {
   return ss.str();
 }
 Color::Color(std::string hex) {
+  auto str = hex;
+  if (hex.starts_with("#"))
+    str = hex.substr(1);
   std::istringstream iss(hex);
   iss >> std::hex;
   int tmp;
@@ -49,6 +53,7 @@ Color::Color(std::string hex) {
   b = tmp / 255.0f;
   iss >> tmp;
   a = tmp / 255.0f;
+  clamp();
 }
 Color::Color(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {
   clamp();
