@@ -11,18 +11,18 @@
 namespace nova {
 std::string to_string(LogLevel level) {
   switch (level) {
-  case nova::LogLevel::Info:
-    return "info";
-  case nova::LogLevel::Debug:
-    return "debug";
-  case nova::LogLevel::Error:
-    return "error";
-  case nova::LogLevel::Warn:
-    return "warn";
-  case nova::LogLevel::None:
-    return "none";
-  default:
-    return "NoLevel";
+    case nova::LogLevel::Info:
+      return "info";
+    case nova::LogLevel::Debug:
+      return "debug";
+    case nova::LogLevel::Error:
+      return "error";
+    case nova::LogLevel::Warn:
+      return "warn";
+    case nova::LogLevel::None:
+      return "none";
+    default:
+      return "NoLevel";
   }
 }
 std::string logger::formatOutput(const std::source_location &location,
@@ -66,14 +66,13 @@ void logger::writeFile(std::string str, LogLevel level) {
   }
 }
 logger Log::my_logger;
-} // namespace nova
+}  // namespace nova
 auto fmt::formatter<nova::LogLevel>::format(nova::LogLevel level,
                                             format_context &ctx) const {
   return formatter<string_view>::format(nova::to_string(level), ctx);
 }
-constexpr auto
-fmt::formatter<nova::format_placeHolder>::parse(format_parse_context &context)
-    -> format_parse_context::iterator {
+constexpr auto fmt::formatter<nova::format_placeHolder>::parse(
+    format_parse_context &context) -> format_parse_context::iterator {
   auto iter{context.begin()};
   const auto end{context.end()};
   place = "{";

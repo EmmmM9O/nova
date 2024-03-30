@@ -2,7 +2,7 @@
 #include <array>
 namespace nova {
 class Position {
-public:
+ public:
   virtual float getX() = 0;
   virtual float getY() = 0;
   virtual bool within(float x, float y, float dst);
@@ -15,7 +15,7 @@ public:
   virtual float angleTo(Position *other);
 };
 class Mat {
-public:
+ public:
   static const int M00 = 0;
   static const int M01 = 3;
   static const int M02 = 6;
@@ -53,9 +53,9 @@ public:
   Mat scl(float scale);
   Mat transpose();
 
-private:
+ private:
   static void mul(data mata, data matb);
   std::array<float, 9> tmp;
 };
 std::string to_string(Mat);
-} // namespace nova
+}  // namespace nova

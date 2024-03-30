@@ -1,4 +1,5 @@
 #include "Math.hpp"
+
 #include "math.h"
 namespace nova {
 bool Position::within(float x, float y, float dst) {}
@@ -26,4 +27,4 @@ float Position::angleTo(Position *other) {
   return angleTo(other->getX(), other->getY());
 }
 
-} // namespace nova
+}  // namespace nova

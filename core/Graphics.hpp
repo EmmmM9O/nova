@@ -1,7 +1,7 @@
 #pragma once
-#include <filesystem>
 #include <fmt/core.h>
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -10,7 +10,7 @@
 #include "core/function.hpp"
 namespace nova {
 class Color {
-public:
+ public:
   float r, g, b, a;
   Color();
   Color(unsigned int rgba8888);
@@ -26,11 +26,11 @@ namespace Colors {
 extern Color black, darkGray, gray, lightGray, white, clear;
 extern float whiteRgba, clearRgba, blackRgba;
 extern float blackFloatBits, clearFloatBits, whiteFloatBits;
-} // namespace Colors
+}  // namespace Colors
 enum class GlType { OpenGL, GLES, WebGL, NONE };
 std::string to_string(GlType gl);
 class GLVersion {
-public:
+ public:
   GLVersion();
   std::string vendorString;
   std::string rendererString;
@@ -42,30 +42,30 @@ public:
   GLVersion(systemType appType, std::string vendorString,
             std::string rendererString, std::string versionString);
 
-private:
+ private:
   void extractVersion(std::string patternString, std::string versionString);
 };
 class GLTexture : public Disposable {
-public:
+ public:
   int glTarget;
   int width, height;
   void dispose() override;
 };
 class Texture : public GLTexture {};
 class TextureRegion {
-public:
+ public:
   Texture texture;
   int width, height;
   float u, v, u2, v2;
   float scale = 1.0f;
 };
 class Mesh : public Disposable {
-public:
+ public:
   int vertexSize;
   void dispose() override;
 };
 class Shader : public Disposable {
-public:
+ public:
   static std::string positionAttribute, texcoordAttribute, mixColorAttribute,
       colorAttribute, normalAttribute;
   static bool pedantic;
@@ -93,11 +93,11 @@ public:
   bool isDisposed();
   void disableVertexAttribute(std::string name);
 
-protected:
+ protected:
   std::string preprocess(std::string source, bool fragment);
   int createProgram();
 
-private:
+ private:
   void fetchUniforms();
   void fetchAttributes();
   int fetchAttributeLocation(std::string name);
@@ -113,7 +113,7 @@ private:
   std::vector<std::string> uniformNames, attributeNames;
 };
 class Blending {
-public:
+ public:
   static Blending *disabled, additive, normal;
   int src, dst, srcAlpha, dstAlpha;
   virtual void apply();
@@ -121,7 +121,7 @@ public:
   Blending(int src, int dst);
 };
 class Batch : public Disposable {
-protected:
+ protected:
   Mesh mesh;
   Color color = Color(1, 1, 1, 1);
   float m_z;
@@ -137,7 +137,7 @@ protected:
   int idx = 0;
   Mat transformMatrix, projectionMatrix, combinedMatrix;
 
-public:
+ public:
   void z(float z);
   void setSort(bool sort);
   void setSortAscending(bool ascend);
@@ -174,18 +174,18 @@ public:
   void switchTexture(Texture texture);
 };
 class SpriteBatch : public Batch {
-public:
+ public:
   static const int VERTEX_SIZE = 2 + 1 + 2 + 1;
   static const int SPRITE_SIZE = 4 * VERTEX_SIZE;
 
-protected:
+ protected:
   float *vertices;
 
-private:
+ private:
   int totalRenderCalls = 0;
   int maxSpritesInBatch = 0;
 
-public:
+ public:
   SpriteBatch();
   SpriteBatch(size_t size);
   SpriteBatch(int size, Shader defaultShader);
@@ -199,7 +199,7 @@ public:
 class SortedSpriteBatch : public SpriteBatch {};
 std::string to_string(GLVersion gl);
 class Graphics : public Disposable {
-public:
+ public:
   virtual GLVersion getGLVersion() = 0;
   virtual void update() = 0;
   virtual void destory() = 0;
@@ -214,11 +214,13 @@ class Draw {
 };
 auto format_as(GlType type) { return to_string(type); }
 auto format_as(GLVersion version) { return to_string(version); }
-} // namespace nova
-template <> struct fmt::formatter<nova::GlType> : formatter<string_view> {
+}  // namespace nova
+template <>
+struct fmt::formatter<nova::GlType> : formatter<string_view> {
   auto format(nova::GlType type, format_context &ctx) const;
 };
-template <> struct fmt::formatter<nova::GLVersion> : formatter<std::string> {
+template <>
+struct fmt::formatter<nova::GLVersion> : formatter<std::string> {
   auto format(const nova::GLVersion &version, format_context &ctx) const
       -> format_context::iterator;
 };

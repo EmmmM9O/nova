@@ -39,8 +39,7 @@ std::string Color::toString() {
 }
 Color::Color(std::string hex) {
   auto str = hex;
-  if (hex.starts_with("#"))
-    str = hex.substr(1);
+  if (hex.starts_with("#")) str = hex.substr(1);
   std::istringstream iss(hex);
   iss >> std::hex;
   int tmp;
@@ -80,16 +79,16 @@ void Color::clamp() {
 }
 std::string to_string(GlType gl) {
   switch (gl) {
-  case GlType::GLES:
-    return "GLES";
-  case GlType::OpenGL:
-    return "OpenGL";
-  case GlType::WebGL:
-    return "WebGL";
-  case GlType::NONE:
-    return "NONE";
-  default:
-    return "NoGLType";
+    case GlType::GLES:
+      return "GLES";
+    case GlType::OpenGL:
+      return "OpenGL";
+    case GlType::WebGL:
+      return "WebGL";
+    case GlType::NONE:
+      return "NONE";
+    default:
+      return "NoGLType";
   }
 }
 GLVersion::GLVersion() {}
@@ -149,13 +148,13 @@ void Graphics::setupTask() {
       0.0_asecond, std::chrono::milliseconds(16), -1));
 }
 
-} // namespace nova
+}  // namespace nova
 auto fmt::formatter<nova::GlType>::format(nova::GlType obj,
                                           format_context &ctx) const {
   return fmt::format_to(ctx.out(), "{}", nova::to_string(obj));
 }
 auto fmt::formatter<nova::GLVersion>::format(const nova::GLVersion &obj,
                                              format_context &ctx) const
--> format_context::iterator{
+    -> format_context::iterator {
   return fmt::format_to(ctx.out(), "{}", nova::to_string(obj));
 }

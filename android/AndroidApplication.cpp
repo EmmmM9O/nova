@@ -268,4 +268,4 @@ long AndroidApplication::getMaxMemory() {
   long res = env->CallLongMethod(coreActivity, javaMethod);
   return res;
 }
-} // namespace nova
+}  // namespace nova
