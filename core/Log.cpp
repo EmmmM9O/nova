@@ -11,18 +11,18 @@
 namespace nova {
 std::string to_string(LogLevel level) {
   switch (level) {
-    case nova::LogLevel::Info:
-      return "info";
-    case nova::LogLevel::Debug:
-      return "debug";
-    case nova::LogLevel::Error:
-      return "error";
-    case nova::LogLevel::Warn:
-      return "warn";
-    case nova::LogLevel::None:
-      return "none";
-    default:
-      return "NoLevel";
+  case nova::LogLevel::Info:
+    return "info";
+  case nova::LogLevel::Debug:
+    return "debug";
+  case nova::LogLevel::Error:
+    return "error";
+  case nova::LogLevel::Warn:
+    return "warn";
+  case nova::LogLevel::None:
+    return "none";
+  default:
+    return "NoLevel";
   }
 }
 std::string logger::formatOutput(const std::source_location &location,
@@ -32,7 +32,7 @@ std::string logger::formatOutput(const std::source_location &location,
                      fmt::arg("column", location.column()),
                      fmt::arg("file", location.file_name()),
                      fmt::arg("function", location.function_name()),
-                     fmt::arg("context", text));
+                     fmt::arg("context", text), fmt::arg("color", placeholder));
 }
 std::string logger::timeFormat(std::string str) {
   return fmt::format(fmt::runtime(formatTime), fmt::arg("context", str),
@@ -66,8 +66,26 @@ void logger::writeFile(std::string str, LogLevel level) {
   }
 }
 logger Log::my_logger;
-}  // namespace nova
+} // namespace nova
 auto fmt::formatter<nova::LogLevel>::format(nova::LogLevel level,
                                             format_context &ctx) const {
-  return formatter<string_view>::format(to_string(level), ctx);
+  return formatter<string_view>::format(nova::to_string(level), ctx);
+}
+constexpr auto
+fmt::formatter<nova::format_placeHolder>::parse(format_parse_context &context)
+    -> format_parse_context::iterator {
+  auto iter{context.begin()};
+  const auto end{context.end()};
+  place = "{";
+  while ((iter != end) && *iter != '}') {
+    place += *iter;
+    iter++;
+  }
+  place += "}";
+  return iter;
+}
+auto fmt::formatter<nova::format_placeHolder>::format(nova::format_placeHolder,
+                                                      format_context &ctx) const
+    -> format_context::iterator {
+  return fmt::format_to(ctx.out(), "{}", place);
 }

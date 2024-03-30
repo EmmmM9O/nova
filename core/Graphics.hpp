@@ -99,7 +99,7 @@ protected:
 
 private:
   void fetchUniforms();
-    void fetchAttributes();
+  void fetchAttributes();
   int fetchAttributeLocation(std::string name);
   int fetchUniformLocation(std::string name);
 
@@ -212,11 +212,13 @@ class Draw {
   static void color(Color color);
   static void alpha(float alpha);
 };
-
+auto format_as(GlType type) { return to_string(type); }
+auto format_as(GLVersion version) { return to_string(version); }
 } // namespace nova
 template <> struct fmt::formatter<nova::GlType> : formatter<string_view> {
   auto format(nova::GlType type, format_context &ctx) const;
 };
-template <> struct fmt::formatter<nova::GLVersion> : formatter<string_view> {
-  auto format(nova::GLVersion version, format_context &ctx) const;
+template <> struct fmt::formatter<nova::GLVersion> : formatter<std::string> {
+  auto format(const nova::GLVersion &version, format_context &ctx) const
+      -> format_context::iterator;
 };

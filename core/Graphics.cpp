@@ -11,7 +11,6 @@
 
 #include "core/ASync.hpp"
 #include "core/Core.hpp"
-#include "core/Log.hpp"
 #include "core/Util.hpp"
 #include "core/application.hpp"
 namespace nova {
@@ -153,9 +152,10 @@ void Graphics::setupTask() {
 } // namespace nova
 auto fmt::formatter<nova::GlType>::format(nova::GlType obj,
                                           format_context &ctx) const {
-  return formatter<string_view>::format(to_string(obj), ctx);
+  return fmt::format_to(ctx.out(), "{}", nova::to_string(obj));
 }
-auto fmt::formatter<nova::GLVersion>::format(nova::GLVersion obj,
-                                             format_context &ctx) const {
-  return formatter<string_view>::format(to_string(obj), ctx);
+auto fmt::formatter<nova::GLVersion>::format(const nova::GLVersion &obj,
+                                             format_context &ctx) const
+-> format_context::iterator{
+  return fmt::format_to(ctx.out(), "{}", nova::to_string(obj));
 }
