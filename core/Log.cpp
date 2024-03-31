@@ -1,7 +1,7 @@
 #include "Log.hpp"
 
-#include <fmt/core.h>
 #include <fmt/chrono.h>
+#include <fmt/core.h>
 #include <fmt/format.h>
 
 #include <filesystem>
@@ -10,6 +10,9 @@
 #include <string>
 namespace nova {
 format_placeHolder placeholder;
+format_placeHolder colorPlaceholder = format_placeHolder("color:");
+format_placeHolder::format_placeHolder() {}
+format_placeHolder::format_placeHolder(std::string p) : place(p) {}
 std::string to_string(LogLevel level) {
   switch (level) {
     case nova::LogLevel::Info:
@@ -33,7 +36,7 @@ std::string logger::formatOutput(const std::source_location &location,
                      fmt::arg("column", location.column()),
                      fmt::arg("file", location.file_name()),
                      fmt::arg("function", location.function_name()),
-                     fmt::arg("context", text), fmt::arg("color", placeholder));
+                     fmt::arg("context", text), fmt::arg("color", colorPlaceholder));
 }
 std::string logger::timeFormat(std::string str) {
   return fmt::format(fmt::runtime(formatTime), fmt::arg("context", str),
@@ -73,9 +76,7 @@ auto fmt::formatter<nova::LogLevel>::format(nova::LogLevel level,
   return formatter<string_view>::format(nova::to_string(level), ctx);
 }
 
-auto fmt::formatter<nova::format_placeHolder>::format(const nova::format_placeHolder&,
-                                                      format_context &ctx) const
--> format_context::iterator
-     {
-  return fmt::format_to(ctx.out(), "{}", place);
+fmt::format_context::iterator fmt::formatter<nova::format_placeHolder>::format(
+    const nova::format_placeHolder & holder, format_context &ctx) const {
+  return fmt::format_to(ctx.out(), "{}","{"+holder.place+ place+"}");
 }

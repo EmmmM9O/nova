@@ -4,29 +4,12 @@
 #include <filesystem>
 #include <string>
 #include <vector>
-
+#include "core/Color.hpp"
 #include "application.hpp"
 #include "core/Math.hpp"
 #include "core/function.hpp"
 namespace nova {
-class Color {
- public:
-  float r, g, b, a;
-  Color();
-  Color(unsigned int rgba8888);
-  Color(std::string hex);
-  Color(float r, float g, float b, float a);
-  void clamp();
-  int rgba8888();
-  int rgba();
-  static int rgba8888(float r, float g, float b, float a);
-  std::string toString();
-};
-namespace Colors {
-extern Color black, darkGray, gray, lightGray, white, clear;
-extern float whiteRgba, clearRgba, blackRgba;
-extern float blackFloatBits, clearFloatBits, whiteFloatBits;
-}  // namespace Colors
+
 enum class GlType { OpenGL, GLES, WebGL, NONE };
 std::string to_string(GlType gl);
 class GLVersion {

@@ -1,6 +1,6 @@
 #pragma once
-#include <fmt/core.h>
 #include <fmt/args.h>
+#include <fmt/core.h>
 
 #include <filesystem>
 #include <source_location>
@@ -15,8 +15,14 @@ enum class LogLevel {
   None,
 };
 std::string to_string(LogLevel level);
-class format_placeHolder {};
+class format_placeHolder {
+public:
+  std::string place;
+  format_placeHolder();
+  format_placeHolder(std::string p);
+};
 extern format_placeHolder placeholder;
+extern format_placeHolder colorPlaceholder;
 class logger {
  public:
   std::time_t time = std::time(nullptr);
@@ -38,7 +44,7 @@ class logger {
            std::string str, Args &&...args) {
     fmt::dynamic_format_arg_store<fmt::format_context> store;
     ((store.push_back(args)), ...);
-    store.push_back(fmt::arg("color", placeholder));
+    store.push_back(fmt::arg("color", colorPlaceholder));
     _log(location, level, fmt::vformat(str, store));
   }
   std::string getFormatFle(LogLevel level);
@@ -83,24 +89,25 @@ struct fmt::formatter<nova::LogLevel> : formatter<string_view> {
 };
 template <>
 class fmt::formatter<nova::format_placeHolder> {
-	public:
-
-  constexpr auto parse(format_parse_context &context) 
-  {
-  auto iter{context.begin()};
-  const auto end{context.end()};
-  place = "{";
-  while ((iter != end) && *iter != '}') {
-    place += *iter;
-    iter++;
+ public:
+  constexpr format_parse_context::iterator parse(
+      format_parse_context &context) {
+    auto iter{context.begin()};
+    const auto end{context.end()};
+    place = "";
+    while ((iter != end) && *iter != '}') {
+      place += *iter;
+      iter++;
+    }
+    return iter;
   }
-  place += "}";
-  return iter;
-}
-  auto format(const nova::format_placeHolder&, format_context &ctx) const -> format_context::iterator;
+  fmt::format_context::iterator format(const nova::format_placeHolder &,
+                                       format_context &ctx) const;
+
  private:
   std::string place;
 };
+
 #define Log_log(level, format, ...)                                \
   nova::Log::my_logger.log(std::source_location::current(), level, \
                            format __VA_OPT__(, ) __VA_ARGS__)

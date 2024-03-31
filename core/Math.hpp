@@ -1,7 +1,15 @@
 #pragma once
 #include <array>
+#include <cmath>
 #include <string>
 namespace nova {
+extern float PI;
+extern float radiansToDegrees;
+extern float radDeg;
+class Angles {
+ public:
+  static float angle(float x, float y, float x2, float y2);
+};
 class Position {
  public:
   virtual float getX() = 0;

@@ -28,5 +28,14 @@ int parseInt(std::string str, int def) {
     return def;
   }
 }
+float intBitsToFloat(int bits) {
+  union {
+    float f;
+    uint32_t i;
+  } converter;
+
+  converter.i = static_cast<uint32_t>(bits);
+  return converter.f;
+}
 
 }  // namespace nova
