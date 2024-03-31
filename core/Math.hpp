@@ -6,12 +6,13 @@ namespace nova {
 extern float PI;
 extern float radiansToDegrees;
 extern float radDeg;
+extern float degreesToRadians;
 class Angles {
- public:
+public:
   static float angle(float x, float y, float x2, float y2);
 };
 class Position {
- public:
+public:
   virtual float getX() = 0;
   virtual float getY() = 0;
   virtual bool within(float x, float y, float dst);
@@ -24,7 +25,7 @@ class Position {
   virtual float angleTo(Position *other);
 };
 class Mat {
- public:
+public:
   static const int M00 = 0;
   static const int M01 = 3;
   static const int M02 = 6;
@@ -38,33 +39,33 @@ class Mat {
   data val;
   Mat();
   Mat(data values);
-  Mat setOrtho(float x, float y, float width, float height);
-  Mat idt();
-  Mat mul(Mat m);
-  Mat mulLeft(Mat m);
-  Mat setToRotation(float degrees);
-  Mat setToRotationRad(float radians);
-  Mat setToTranslation(float x, float y);
-  Mat setToScaling(float scaleX, float scaleY);
+  Mat *setOrtho(float x, float y, float width, float height);
+  Mat *idt();
+  Mat *mul(Mat m);
+  Mat *mulLeft(Mat m);
+  Mat *setToRotation(float degrees);
+  Mat *setToRotationRad(float radians);
+  Mat *setToTranslation(float x, float y);
+  Mat *setToScaling(float scaleX, float scaleY);
   std::string toString();
   float det();
-  Mat inv();
-  Mat set(Mat mat);
-  Mat set(data values);
-  Mat trn(float x, float y);
-  Mat translate(float x, float y);
-  Mat rotate(float degrees);
-  Mat rotateRad(float radians);
-  Mat scale(float scaleX, float scaleY);
+  Mat *inv();
+  Mat *set(Mat mat);
+  Mat *set(data values);
+  Mat *trn(float x, float y);
+  Mat *translate(float x, float y);
+  Mat *rotate(float degrees);
+  Mat *rotateRad(float radians);
+  Mat *scale(float scaleX, float scaleY);
   data getValues();
   float getRotationRad();
   float getRotation();
-  Mat scl(float scale);
-  Mat transpose();
+  Mat *scl(float scale);
+  Mat *transpose();
 
- private:
+private:
   static void mul(data mata, data matb);
   std::array<float, 9> tmp;
 };
 std::string to_string(Mat);
-}  // namespace nova
+} // namespace nova
