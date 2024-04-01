@@ -13,16 +13,16 @@ public:
 };
 class Position {
 public:
-  virtual float getX() = 0;
-  virtual float getY() = 0;
-  virtual bool within(float x, float y, float dst);
-  virtual bool within(Position *other, float dst);
-  virtual float dst2(float x, float y);
-  virtual float dst(float x, float y);
-  virtual float dst(Position *other);
-  virtual float dst2(Position *other);
-  virtual float angleTo(float x, float y);
-  virtual float angleTo(Position *other);
+  virtual float getX() const = 0;
+  virtual float getY() const = 0;
+  virtual bool within(float x, float y, float dst) const;
+  virtual bool within(Position *other, float dst) const;
+  virtual float dst2(float x, float y) const;
+  virtual float dst(float x, float y) const;
+  virtual float dst(Position *other) const;
+  virtual float dst2(Position *other) const;
+  virtual float angleTo(float x, float y) const;
+  virtual float angleTo(Position *other) const;
 };
 class Mat {
 public:
@@ -41,31 +41,31 @@ public:
   Mat(data values);
   Mat *setOrtho(float x, float y, float width, float height);
   Mat *idt();
-  Mat *mul(Mat m);
-  Mat *mulLeft(Mat m);
+  Mat *mul(const Mat &m);
+  Mat *mulLeft(const Mat &m);
   Mat *setToRotation(float degrees);
   Mat *setToRotationRad(float radians);
   Mat *setToTranslation(float x, float y);
   Mat *setToScaling(float scaleX, float scaleY);
-  std::string toString();
-  float det();
+  std::string toString() const;
+  float det() const;
   Mat *inv();
-  Mat *set(Mat mat);
-  Mat *set(data values);
+  Mat *set(const Mat &mat);
+  Mat *set(const data &values);
   Mat *trn(float x, float y);
   Mat *translate(float x, float y);
   Mat *rotate(float degrees);
   Mat *rotateRad(float radians);
   Mat *scale(float scaleX, float scaleY);
-  data getValues();
-  float getRotationRad();
-  float getRotation();
+  data &getValues();
+  float getRotationRad() const;
+  float getRotation() const;
   Mat *scl(float scale);
   Mat *transpose();
 
 private:
   static void mul(data mata, data matb);
-  std::array<float, 9> tmp;
+  data tmp;
 };
 std::string to_string(Mat);
 } // namespace nova

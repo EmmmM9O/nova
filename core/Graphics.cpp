@@ -17,21 +17,22 @@ namespace nova {
 
 std::string to_string(GlType gl) {
   switch (gl) {
-    case GlType::GLES:
-      return "GLES";
-    case GlType::OpenGL:
-      return "OpenGL";
-    case GlType::WebGL:
-      return "WebGL";
-    case GlType::NONE:
-      return "NONE";
-    default:
-      return "NoGLType";
+  case GlType::GLES:
+    return "GLES";
+  case GlType::OpenGL:
+    return "OpenGL";
+  case GlType::WebGL:
+    return "WebGL";
+  case GlType::NONE:
+    return "NONE";
+  default:
+    return "NoGLType";
   }
 }
 GLVersion::GLVersion() {}
-GLVersion::GLVersion(systemType appType, std::string vendorString,
-                     std::string rendererString, std::string versionString)
+GLVersion::GLVersion(systemType appType, const std::string &vendorString,
+                     const std::string &rendererString,
+                     const std::string &versionString)
     : vendorString(vendorString), rendererString(rendererString) {
   if (appType == systemType::Android)
     type = GlType::GLES;
@@ -49,13 +50,13 @@ GLVersion::GLVersion(systemType appType, std::string vendorString,
     majorVersion = -1;
     minorVersion = -1;
     releaseVersion = -1;
-    vendorString = "";
-    rendererString = "";
+    this->vendorString = "";
+    this->rendererString = "";
   }
 }
 
-void GLVersion::extractVersion(std::string patternString,
-                               std::string versionString) {
+void GLVersion::extractVersion(const std::string& patternString,
+                               const std::string& versionString) {
   std::regex re(patternString);
   std::smatch m;
   if (std::regex_search(versionString, m, re)) {
@@ -69,7 +70,7 @@ void GLVersion::extractVersion(std::string patternString,
     releaseVersion = 0;
   }
 }
-std::string GLVersion::toString() {
+std::string GLVersion::toString() const{
   return to_string(type) + " " + std::to_string(majorVersion) + "." +
          std::to_string(minorVersion) + "." + std::to_string(releaseVersion) +
          " / " + vendorString + " / " + rendererString;
@@ -86,13 +87,12 @@ void Graphics::setupTask() {
       0.0_asecond, std::chrono::milliseconds(16), -1));
 }
 
-}  // namespace nova
+} // namespace nova
 auto fmt::formatter<nova::GlType>::format(nova::GlType obj,
                                           format_context &ctx) const {
   return fmt::format_to(ctx.out(), "{}", nova::to_string(obj));
 }
 auto fmt::formatter<nova::GLVersion>::format(const nova::GLVersion &obj,
-                                             format_context &ctx) const
-     {
+                                             format_context &ctx) const {
   return fmt::format_to(ctx.out(), "{}", nova::to_string(obj));
 }
