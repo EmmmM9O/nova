@@ -56,10 +56,11 @@ public:
   static bool pedantic;
   static std::string prependVertexCode, prependFragmentCode;
   void dispose() override;
-  Shader(std::string vertexShader, std::string fragmentShader);
-  Shader(std::filesystem::path vertexShader,
-         std::filesystem::path fragmentShader);
+  Shader(const std::string &vertexShader, const std::string &fragmentShader);
+  Shader(const std::filesystem::path &vertexShader,
+         const std::filesystem::path &fragmentShader);
   std::string getLog();
+  virtual void apply();
   bool isCompiled();
   int fetchUniformLocation(std::string name, bool pedantic);
   void setUniformi(std::string name, int value);
@@ -79,7 +80,7 @@ public:
   void disableVertexAttribute(std::string name);
 
 protected:
-  std::string preprocess(std::string source, bool fragment);
+  std::string preprocess(const std::string &source, bool fragment);
   int createProgram();
 
 private:
@@ -89,8 +90,9 @@ private:
   int fetchUniformLocation(std::string name);
 
   int linkProgram(int program);
-  void compileShaders(std::string vertexShader, std::string fragmentShader);
-  int loadShader(int type, std::string source);
+  void compileShaders(const std::string &vertexShader,
+                      const std::string &fragmentShader);
+  int loadShader(int type, const std::string &source);
   std::string fragmentShaderSource, vertexShaderSource;
   bool _isCompiled, disposed;
   std::string log = "";

@@ -1,1 +1,3 @@
 third_party/** linguist-vendored
+*.h linguist-vendored
+deaktop/include/** linguist-vendored

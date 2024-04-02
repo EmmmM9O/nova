@@ -2,6 +2,7 @@
 
 #include <fmt/core.h>
 #include <fmt/format.h>
+#include <stdexcept>
 #include <unistd.h>
 
 #include <chrono>
@@ -11,6 +12,7 @@
 
 #include "core/ASync.hpp"
 #include "core/Core.hpp"
+#include "core/Log.hpp"
 #include "core/Util.hpp"
 #include "core/application.hpp"
 namespace nova {
@@ -55,8 +57,8 @@ GLVersion::GLVersion(systemType appType, const std::string &vendorString,
   }
 }
 
-void GLVersion::extractVersion(const std::string& patternString,
-                               const std::string& versionString) {
+void GLVersion::extractVersion(const std::string &patternString,
+                               const std::string &versionString) {
   std::regex re(patternString);
   std::smatch m;
   if (std::regex_search(versionString, m, re)) {
@@ -70,11 +72,86 @@ void GLVersion::extractVersion(const std::string& patternString,
     releaseVersion = 0;
   }
 }
-std::string GLVersion::toString() const{
+std::string GLVersion::toString() const {
   return to_string(type) + " " + std::to_string(majorVersion) + "." +
          std::to_string(minorVersion) + "." + std::to_string(releaseVersion) +
          " / " + vendorString + " / " + rendererString;
 }
+Shader::Shader(const std::string &vertexShader_,
+               const std::string &fragmentShader_) {
+  if (vertexShader_.empty())
+    throw std::invalid_argument("vertex shader must not be null");
+  if (fragmentShader_.empty())
+    throw std::invalid_argument("fragment shader must not be null");
+  auto vertexShader = preprocess(vertexShader_, false);
+  auto fragmentShader = preprocess(fragmentShader_, true);
+  if (!prependVertexCode.empty())
+    vertexShader = prependVertexCode + vertexShader;
+  if (!prependFragmentCode.empty())
+    fragmentShader = prependFragmentCode + fragmentShader;
+  this->vertexShaderSource = vertexShader;
+  this->fragmentShaderSource = fragmentShader;
+  compileShaders(vertexShader, fragmentShader);
+  if (isCompiled()) {
+    fetchAttributes();
+    fetchUniforms();
+  } else {
+    throw std::invalid_argument("Failed to compile shader: " + log);
+  }
+}
+Shader::Shader(const std::filesystem::path &vertexShader,
+               const std::filesystem::path &fragmentShader)
+    : Shader(readFile(vertexShader), readFile(fragmentShader)) {
+  if (!log.empty()) {
+    Log_warn("Shader {} | {}:\n{}", vertexShader.string(),
+             fragmentShader.string(), log);
+  }
+}
+void Shader::apply() {}
+std::string preprocess(const std::string &source, bool fragment) {
+  if (source.find("#ifdef GL_ES") != source.npos) {
+    throw std::runtime_error("Shader contains GL_ES specific code; this should "
+                             "be handled by the preprocessor. Code: \n```\n" +
+                             source + "\n```");
+  }
+  if (source.find("#version") != source.npos) {
+    throw std::runtime_error(
+        "Shader contains explicit version requirement; this should be handled "
+        "by the preprocessor. Code: \n```\n" +
+        source + "\n```");
+  }
+  std::string res;
+  if (fragment) {
+    res = "#ifdef GL_ES\n"
+          "precision " +
+          std::string(source.find("#define HIGHP") != source.npos &&
+                              source.find("//#define HIGHP") == source.npos
+                          ? "highp"
+                          : "mediump") +
+          " float;\n"
+          "precision mediump int;\n"
+          "#else\n"
+          "#define lowp  \n"
+          "#define mediump \n"
+          "#define highp \n"
+          "#endif\n" +
+          source;
+  } else {
+    res = "#ifndef GL_ES\n"
+          "#define lowp  \n"
+          "#define mediump \n"
+          "#define highp \n"
+          "#endif\n" +
+          source;
+  }
+  return res;
+}
+void Shader::compileShaders(const std::string &vertexShader,
+                            const std::string &fragmentShader) {}
+int Shader::loadShader(int type, const std::string &source) {
+
+}
+Shader SpriteBatch::createShader() {}
 std::string to_string(GLVersion version) { return version.toString(); }
 void Graphics::setupTask() {
   nova::Core::context->post(async::Timer(
