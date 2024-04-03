@@ -8,11 +8,11 @@ extern float radiansToDegrees;
 extern float radDeg;
 extern float degreesToRadians;
 class Angles {
-public:
+ public:
   static float angle(float x, float y, float x2, float y2);
 };
 class Position {
-public:
+ public:
   virtual float getX() const = 0;
   virtual float getY() const = 0;
   virtual bool within(float x, float y, float dst) const;
@@ -25,7 +25,7 @@ public:
   virtual float angleTo(Position *other) const;
 };
 class Mat {
-public:
+ public:
   static const int M00 = 0;
   static const int M01 = 3;
   static const int M02 = 6;
@@ -63,9 +63,9 @@ public:
   Mat *scl(float scale);
   Mat *transpose();
 
-private:
+ private:
   static void mul(data mata, data matb);
   data tmp;
 };
 std::string to_string(Mat);
-} // namespace nova
+}  // namespace nova

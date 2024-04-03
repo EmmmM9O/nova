@@ -1,8 +1,9 @@
 #include "Math.hpp"
 
+#include <stdexcept>
+
 #include "fmt/format.h"
 #include "math.h"
-#include <stdexcept>
 namespace nova {
 float PI = M_PI;
 float radiansToDegrees = (180.0f) / PI;
@@ -10,8 +11,7 @@ float radDeg = radiansToDegrees;
 float degreesToRadians = (PI / 180.0f);
 float Angles::angle(float x, float y, float x2, float y2) {
   float ang = atan2(x2 - x, y2 - y) * radDeg;
-  if (ang < 0)
-    ang += 360.0f;
+  if (ang < 0) ang += 360.0f;
   return ang;
 }
 bool Position::within(float x, float y, float dst) const {
@@ -144,7 +144,6 @@ Mat *Mat::mul(const Mat &m) {
   return this;
 }
 Mat *Mat::mulLeft(const Mat &m) {
-
   auto &val = this->val;
   float v00 =
       m.val[M00] * val[M00] + m.val[M01] * val[M10] + m.val[M02] * val[M20];
@@ -246,8 +245,7 @@ float Mat::det() const {
 }
 Mat *Mat::inv() {
   float det = this->det();
-  if (det == 0)
-    throw new std::runtime_error("Can't invert a singular matrix");
+  if (det == 0) throw new std::runtime_error("Can't invert a singular matrix");
 
   float inv_det = 1.0f / det;
   auto &tmp = this->tmp, &val = this->val;
@@ -303,8 +301,7 @@ Mat *Mat::rotate(float degrees) {
   return rotateRad(degreesToRadians * degrees);
 }
 Mat *Mat::rotateRad(float radians) {
-  if (radians == 0)
-    return this;
+  if (radians == 0) return this;
   float cos = (float)std::cos(radians);
   float sin = (float)std::sin(radians);
   auto &tmp = this->tmp;
@@ -364,4 +361,4 @@ Mat *Mat::transpose() {
   val[M21] = v21;
   return this;
 }
-} // namespace nova
+}  // namespace nova

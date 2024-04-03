@@ -16,7 +16,7 @@ enum class LogLevel {
 };
 std::string to_string(LogLevel level);
 class format_placeHolder {
-public:
+ public:
   std::string place;
   format_placeHolder();
   format_placeHolder(std::string p);

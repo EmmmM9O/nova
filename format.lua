@@ -19,5 +19,6 @@ function main(...)
 	traverseDir(path.."/linux")
 	traverseDir(path.."/test")
 	traverseDir(path.."/example")
+	traverseDir(path.."/desktop")
 	print("end format")
 end
