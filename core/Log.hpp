@@ -1,4 +1,5 @@
 #pragma once
+#include <fmt/args.h>
 #include <fmt/core.h>
 
 #include <filesystem>
@@ -14,6 +15,14 @@ enum class LogLevel {
   None,
 };
 std::string to_string(LogLevel level);
+class format_placeHolder {
+ public:
+  std::string place;
+  format_placeHolder();
+  format_placeHolder(std::string p);
+};
+extern format_placeHolder placeholder;
+extern format_placeHolder colorPlaceholder;
 class logger {
  public:
   std::time_t time = std::time(nullptr);
@@ -25,10 +34,6 @@ class logger {
   std::filesystem::path logDir;
   std::string_view fileFormat = "log-{time:%Y-%m-%d}.log";
 
-  template <typename... Args>
-  std::string format(fmt::format_string<Args...> str, Args &&...args) {
-    return fmt::vformat(str, fmt::make_format_args(args...));
-  }
   std::string formatOutput(const std::source_location &location,
                            const LogLevel &level, std::string text);
   std::string timeFormat(std::string str);
@@ -36,8 +41,11 @@ class logger {
             std::string text);
   template <typename... Args>
   void log(const std::source_location &location, const LogLevel &level,
-           fmt::format_string<Args...> str, Args &&...args) {
-    _log(location, level, fmt::vformat(str, fmt::make_format_args(args...)));
+           std::string str, Args &&...args) {
+    fmt::dynamic_format_arg_store<fmt::format_context> store;
+    ((store.push_back(args)), ...);
+    store.push_back(fmt::arg("color", colorPlaceholder));
+    _log(location, level, fmt::vformat(str, store));
   }
   std::string getFormatFle(LogLevel level);
   void writeFile(std::string str, LogLevel level);
@@ -74,10 +82,32 @@ class Log {
   }
 };
 }  // namespace nova
+//
 template <>
 struct fmt::formatter<nova::LogLevel> : formatter<string_view> {
   auto format(nova::LogLevel level, format_context &ctx) const;
 };
+template <>
+class fmt::formatter<nova::format_placeHolder> {
+ public:
+  constexpr format_parse_context::iterator parse(
+      format_parse_context &context) {
+    auto iter{context.begin()};
+    const auto end{context.end()};
+    place = "";
+    while ((iter != end) && *iter != '}') {
+      place += *iter;
+      iter++;
+    }
+    return iter;
+  }
+  fmt::format_context::iterator format(const nova::format_placeHolder &,
+                                       format_context &ctx) const;
+
+ private:
+  std::string place;
+};
+
 #define Log_log(level, format, ...)                                \
   nova::Log::my_logger.log(std::source_location::current(), level, \
                            format __VA_OPT__(, ) __VA_ARGS__)

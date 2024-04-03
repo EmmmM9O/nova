@@ -7,6 +7,7 @@
 #include <mutex>
 #include <string>
 namespace nova {
+bool Disposable::isDisposed() const { return false; }
 void Application::addListener(std::shared_ptr<ApplicationListener> listener) {
   std::lock_guard<std::mutex> guard(mt);
   getListeners().push_back(listener);

@@ -120,11 +120,11 @@ bool Timer::if_run() {
               : ((std::chrono::steady_clock::now() - lastRun) >= interval));
 }
 bool Timer::if_delete() {
-  return (stopped) || ((times > repeatCount) && ( repeatCount>= 0));
+  return (stopped) || ((times > repeatCount) && (repeatCount >= 0));
 }
 void Timer::on_destroy() {}
 void Timer::finish() {
-  if(repeatCount>=0) times++;
+  if (repeatCount >= 0) times++;
   lastRun = std::chrono::steady_clock::now();
 }
 std::any Timer::return_post_any() { return return_post(); }

@@ -15,7 +15,7 @@ AndroidGraphics::AndroidGraphics() {
   mEglSurface = EGL_NO_SURFACE;
   mEglContext = EGL_NO_CONTEXT;
 }
-void AndroidGraphics::init(ANativeWindow* native_window) {
+void AndroidGraphics::init(ANativeWindow *native_window) {
   mANativeWindow = native_window;
   // 1.得到默认的显示设备（就是窗口） -- eglGetDisplay
   mEglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);

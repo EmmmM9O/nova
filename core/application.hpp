@@ -13,6 +13,7 @@ enum class runType { Desktop, Headless };
 class Disposable {
  public:
   virtual void dispose() = 0;
+  virtual bool isDisposed() const;
 };
 class ApplicationListener {
  public:
