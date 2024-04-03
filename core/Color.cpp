@@ -34,7 +34,27 @@ float Color::toFloatBits() const {
 float Color::intToFloatColor(int value) {
   return intBitsToFloat(value & 0xfeffffff);
 }
+int Color::floatToIntColor(float value) { return floatToRawIntBits(value); }
 int Color::rgba() const { return rgba8888(); }
+void Color::set(const Color& color) {
+  r = color.r;
+  b = color.b;
+  g = color.g;
+  a = color.a;
+}
+void Color::set(float r, float g, float b, float a) {
+  this->r = r;
+  this->g = g;
+  this->b = b;
+  this->a = a;
+}
+void Color::abgr8888(float value) {
+  int c = floatToIntColor(value);
+  a = ((c & 0xff000000) >> 24) / 255.0f;
+  b = ((c & 0x00ff0000) >> 16) / 255.0f;
+  g = ((c & 0x0000ff00) >> 8) / 255.0f;
+  r = ((c & 0x000000ff)) / 255.0f;
+}
 std::string Color::toString() const {
   std::stringstream ss;
   ss << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(r)
@@ -42,11 +62,11 @@ std::string Color::toString() const {
      << static_cast<int>(b) << std::setw(2) << static_cast<int>(a);
   return ss.str();
 }
-Color::Color(std::string hex) {
+Color::Color(const std::string& hex) {
   auto str = hex;
   if (hex.starts_with("#")) str = hex.substr(1);
   std::stringstream iss;
-  iss << std::hex<<str;
+  iss << std::hex << str;
   unsigned int color;
   iss >> color;
   if (str.length() == 6) {
@@ -62,10 +82,10 @@ Color::Color(std::string hex) {
     throw std::invalid_argument(
         "Invalid hex color code. It should be 6 or 8 characters long.");
   }
-  r/=255.0f;
-  g/=255.0f;
-  b/=255.0f;
-  a/=255.0f;
+  r /= 255.0f;
+  g /= 255.0f;
+  b /= 255.0f;
+  a /= 255.0f;
 
   clamp();
 }
@@ -182,11 +202,11 @@ std::map<std::string, Color> colors = {
 }  // namespace nova
 fmt::format_context::iterator fmt::formatter<nova::Color>::format(
     const nova::Color& color, format_context& ctx) const {
-  return fmt::format_to(ctx.out(), "{}", nova::to_string(color));
+  return fmt::format_to(ctx.out(), "{}", color.toString());
 }
 fmt::format_context::iterator fmt::formatter<nova::ConsoleColorManager>::format(
     const nova::ConsoleColorManager& manager, format_context& ctx) const {
   return fmt::format_to(
       ctx.out(), "{}",
-      (clear ? nova::Color::clearConsoleColor() : nova::to_string(color)));
+      (clear ? nova::Color::clearConsoleColor() : color.toString()));
 }

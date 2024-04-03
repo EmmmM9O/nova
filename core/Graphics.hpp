@@ -1,20 +1,21 @@
 #pragma once
 #include <fmt/core.h>
 
+#include <filesystem>
+#include <string>
+#include <vector>
+
 #include "application.hpp"
 #include "core/Color.hpp"
 #include "core/Gl.hpp"
 #include "core/Math.hpp"
 #include "core/function.hpp"
-#include <filesystem>
-#include <string>
-#include <vector>
 namespace nova {
 
 enum class GlType { OpenGL, GLES, WebGL, NONE };
 std::string to_string(GlType gl);
 class GLVersion {
-public:
+ public:
   GLVersion();
   std::string vendorString;
   std::string rendererString;
@@ -27,132 +28,129 @@ public:
             const std::string &rendererString,
             const std::string &versionString);
 
-private:
+ private:
   void extractVersion(const std::string &patternString,
                       const std::string &versionString);
 };
 class GLTexture : public Disposable {
-public:
+ public:
   int glTarget;
   int width, height;
   void dispose() override;
 };
 class Texture : public GLTexture {};
 class TextureRegion {
-public:
+ public:
   Texture texture;
   int width, height;
   float u, v, u2, v2;
   float scale = 1.0f;
 };
 class Mesh : public Disposable {
-public:
+ public:
   int vertexSize;
   void dispose() override;
 };
 class Shader : public Disposable {
-public:
+ public:
+  using ProgramKey = GUInt;
   using ShaderKey = GUInt;
   using ShaderType = GEnum;
-  static std::string positionAttribute, texcoordAttribute, mixColorAttribute,
-      colorAttribute, normalAttribute;
-  static bool pedantic;
+  // static std::string positionAttribute, texcoordAttribute, mixColorAttribute,
+  //   colorAttribute, normalAttribute;
+  // static bool pedantic;
   static std::string prependVertexCode, prependFragmentCode;
   void dispose() override;
+  Shader(const char *vertexShader, const char *fragmentShader);
   Shader(const std::string &vertexShader, const std::string &fragmentShader);
   Shader(const std::filesystem::path &vertexShader,
          const std::filesystem::path &fragmentShader);
-  std::string getLog();
+  std::string getLog() const;
   virtual void apply();
-  bool isCompiled();
-  int fetchUniformLocation(std::string name, bool pedantic);
-  void setUniformi(std::string name, int value);
-  void setUniformi(int location, int value);
-  void setUniformf(int location, float value);
-  void setUniformf(std::string name, float value);
-  void setUniformi(int location, int value1, int value2, int value3,
-                   int value4);
-  void setUniformi(std::string name, int value1, int value2, int value3,
-                   int value4);
-  void setUniformi(int location, int value1, int value2, int value3);
-  void setUniformi(std::string name, int value1, int value2, int value3);
-  void setUniformi(int location, int value1, int value2);
-  void setUniformi(std::string name, int value1, int value2);
+  bool isCompiled() const;
   void bind();
-  bool isDisposed();
-  void disableVertexAttribute(std::string name);
+  bool isDisposed() const;
 
-protected:
+ protected:
   std::string preprocess(const std::string &source, bool fragment);
-  int createProgram();
+  ProgramKey createProgram();
 
-private:
+ private:
   void fetchUniforms();
   void fetchAttributes();
   int fetchAttributeLocation(std::string name);
   int fetchUniformLocation(std::string name);
 
-  int linkProgram(int program);
+  ProgramKey linkProgram(ProgramKey program);
   void compileShaders(const std::string &vertexShader,
                       const std::string &fragmentShader);
   ShaderKey loadShader(ShaderType type, const std::string &source);
   std::string fragmentShaderSource, vertexShaderSource;
   bool _isCompiled, disposed;
   std::string log = "";
-  int program;
+  ProgramKey program;
   ShaderKey vertexShaderHandle, fragmentShaderHandle;
   std::vector<std::string> uniformNames, attributeNames;
 };
 class Blending {
-public:
-  static Blending *disabled, additive, normal;
-  int src, dst, srcAlpha, dstAlpha;
+ public:
+  bool equal(Blending *blending);
+  static Blending additive, normal;
+  GEnum src, dst, srcAlpha, dstAlpha;
   virtual void apply();
-  Blending(int src, int dst, int srcAlpha, int dstAlpha);
-  Blending(int src, int dst);
+  Blending(GEnum src, GEnum dst, GEnum srcAlpha, GEnum dstAlpha);
+  Blending(GEnum src, GEnum dst);
+};
+class DisableBlending : public Blending {
+ public:
+  static DisableBlending disable;
+  void apply() override;
+  DisableBlending(GEnum src, GEnum dst, GEnum srcAlpha, GEnum dstAlpha);
+  DisableBlending(GEnum src, GEnum dst);
 };
 class Batch : public Disposable {
-protected:
+ protected:
   Mesh mesh;
   Color color = Color(1, 1, 1, 1);
   float m_z;
   Texture *lastTexture = nullptr;
   Shader shader, customShader;
   bool ownsShader;
-  float mixColorPacked;
-  float colorPacked;
-  Color mixColor;
+  float mixColorPacked = Colors::clearFloatBits;
+  float colorPacked = Colors::whiteFloatBits;
+  Color mixColor = Colors::white;
 
   bool apply;
   bool sortAscending = true;
   int idx = 0;
   Mat transformMatrix, projectionMatrix, combinedMatrix;
+  Blending *blending = &Blending::normal;
 
-public:
+ public:
   void z(float z);
-  void setSort(bool sort);
+  virtual void setSort(bool sort);
   void setSortAscending(bool ascend);
-  Color getMixColor();
+  Color getMixColor() const;
   void setMixColor(float r, float g, float b, float a);
-  void setMixColor(Color tint);
-  float getPackedColor();
+  void setMixColor(const Color &tint);
+  float getPackedColor() const;
   void setPackedColor(float packedColor);
-  float getPackedMixColor();
+  float getPackedMixColor() const;
   void setPackedMixColor(float packedColor);
 
   void dispose() override;
-  void setColor(Color color);
+  void setColor(const Color &color);
   void setColor(float r, float g, float b, float a);
-  Color getColor();
+  Color getColor() const;
   virtual void draw(TextureRegion region, float x, float y, float originX,
                     float originY, float width, float height,
                     float rotation) = 0;
   virtual void draw(Texture texture, float *spriteVertices, int offset,
-                    int count);
+                    int count) = 0;
   void draw(Runnable request);
   virtual void flush();
-  void setBlending(Blending blending);
-  Blending getBlending();
+  void setBlending(Blending *blending);
+  Blending *getBlending();
   void discard();
   Mat getProjection();
   Mat getTransform();
@@ -165,18 +163,18 @@ public:
   void switchTexture(Texture texture);
 };
 class SpriteBatch : public Batch {
-public:
+ public:
   static const int VERTEX_SIZE = 2 + 1 + 2 + 1;
   static const int SPRITE_SIZE = 4 * VERTEX_SIZE;
 
-protected:
+ protected:
   float *vertices;
 
-private:
+ private:
   int totalRenderCalls = 0;
   int maxSpritesInBatch = 0;
 
-public:
+ public:
   SpriteBatch();
   SpriteBatch(size_t size);
   SpriteBatch(int size, Shader defaultShader);
@@ -190,7 +188,7 @@ public:
 class SortedSpriteBatch : public SpriteBatch {};
 std::string to_string(GLVersion gl);
 class Graphics : public Disposable {
-public:
+ public:
   virtual GLVersion getGLVersion() = 0;
   virtual void update() = 0;
   virtual void destory() = 0;
@@ -203,10 +201,12 @@ class Draw {
   static void color(Color color);
   static void alpha(float alpha);
 };
-} // namespace nova
-template <> struct fmt::formatter<nova::GlType> : formatter<string_view> {
+}  // namespace nova
+template <>
+struct fmt::formatter<nova::GlType> : formatter<string_view> {
   auto format(nova::GlType type, format_context &ctx) const;
 };
-template <> struct fmt::formatter<nova::GLVersion> : formatter<string_view> {
+template <>
+struct fmt::formatter<nova::GLVersion> : formatter<string_view> {
   auto format(const nova::GLVersion &version, format_context &ctx) const;
 };

@@ -1,9 +1,10 @@
 #pragma once
 #include <cctype>
 #include <compare>
+#include <iostream>
 #include <map>
 #include <string>
-#include <iostream>
+
 #include "core/Util.hpp"
 #include "fmt/core.h"
 #include "fmt/format.h"
@@ -13,7 +14,7 @@ class Color {
   float r, g, b, a;
   Color();
   Color(unsigned int rgba8888);
-  Color(std::string hex);
+  Color(const std::string &hex);
   Color(float r, float g, float b, float a);
   void clamp();
   int rgba8888() const;
@@ -22,8 +23,12 @@ class Color {
   std::string toString() const;
   std::string toConsole() const;
   static float intToFloatColor(int value);
+  static int floatToIntColor(float value);
   static std::string clearConsoleColor();
   float toFloatBits() const;
+  void set(const Color &color);
+  void set(float r, float g, float b, float a);
+  void abgr8888(float value);
 };
 /*
  * to parse color in fmt
@@ -123,24 +128,25 @@ class fmt::formatter<nova::ConsoleColorManager> {
       iter++;
     }
     if (state == stateType::rgb) {
-	    if(data!=""){
-          int num = nova::parseInt(data, 0);
-          if (num >= 256) {
-            throw fmt::format_error{"Invaild rgb Number"};
-          }
-          if (r == -1) {
-            r = num;
-          } else if (g == -1) {
-            g = num;
-          } else if (b == -1) {
-            b = num;
-          } else {
-          }
-          data = "";
-	    }
+      if (data != "") {
+        int num = nova::parseInt(data, 0);
+        if (num >= 256) {
+          throw fmt::format_error{"Invaild rgb Number"};
+        }
+        if (r == -1) {
+          r = num;
+        } else if (g == -1) {
+          g = num;
+        } else if (b == -1) {
+          b = num;
+        } else {
+        }
+        data = "";
+      }
 
       if (b == -1) throw fmt::format_error{"RGB lose some"};
-      color = nova::Color((float)r / 255.0f,(float)g / 255.0f, (float)b / 255.0f, 1);
+      color = nova::Color((float)r / 255.0f, (float)g / 255.0f,
+                          (float)b / 255.0f, 1);
     }
     if (state == stateType::hex) {
       color = nova::Color(data);

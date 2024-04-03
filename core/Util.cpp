@@ -40,7 +40,15 @@ float intBitsToFloat(int bits) {
   converter.i = static_cast<uint32_t>(bits);
   return converter.f;
 }
+int floatToRawIntBits(float value) {
+  union {
+    float f;
+    uint32_t i;
+  } converter;
 
+  converter.f = value;
+  return static_cast<int>(converter.i);
+}
 std::string readFile(const std::filesystem::path &path) {
   std::ifstream file(path);
   if (!file.is_open()) {
@@ -54,4 +62,4 @@ std::string readFile(const std::filesystem::path &path) {
   else
     throw std::runtime_error("file read error" + path.string());
 }
-} // namespace nova
+}  // namespace nova

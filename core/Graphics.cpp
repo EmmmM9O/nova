@@ -2,12 +2,12 @@
 
 #include <fmt/core.h>
 #include <fmt/format.h>
-#include <stdexcept>
 #include <unistd.h>
 
 #include <chrono>
 #include <regex>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 #include "core/ASync.hpp"
@@ -15,20 +15,21 @@
 #include "core/Log.hpp"
 #include "core/Util.hpp"
 #include "core/application.hpp"
+#include "core/function.hpp"
 namespace nova {
 
 std::string to_string(GlType gl) {
   switch (gl) {
-  case GlType::GLES:
-    return "GLES";
-  case GlType::OpenGL:
-    return "OpenGL";
-  case GlType::WebGL:
-    return "WebGL";
-  case GlType::NONE:
-    return "NONE";
-  default:
-    return "NoGLType";
+    case GlType::GLES:
+      return "GLES";
+    case GlType::OpenGL:
+      return "OpenGL";
+    case GlType::WebGL:
+      return "WebGL";
+    case GlType::NONE:
+      return "NONE";
+    default:
+      return "NoGLType";
   }
 }
 GLVersion::GLVersion() {}
@@ -77,6 +78,9 @@ std::string GLVersion::toString() const {
          std::to_string(minorVersion) + "." + std::to_string(releaseVersion) +
          " / " + vendorString + " / " + rendererString;
 }
+
+Shader::Shader(const char *vertexShader, const char *fragmentShader)
+    : Shader(std::string(vertexShader), std::string(fragmentShader)) {}
 Shader::Shader(const std::string &vertexShader_,
                const std::string &fragmentShader_) {
   if (vertexShader_.empty())
@@ -110,9 +114,10 @@ Shader::Shader(const std::filesystem::path &vertexShader,
 void Shader::apply() {}
 std::string preprocess(const std::string &source, bool fragment) {
   if (source.find("#ifdef GL_ES") != source.npos) {
-    throw std::runtime_error("Shader contains GL_ES specific code; this should "
-                             "be handled by the preprocessor. Code: \n```\n" +
-                             source + "\n```");
+    throw std::runtime_error(
+        "Shader contains GL_ES specific code; this should "
+        "be handled by the preprocessor. Code: \n```\n" +
+        source + "\n```");
   }
   if (source.find("#version") != source.npos) {
     throw std::runtime_error(
@@ -122,27 +127,29 @@ std::string preprocess(const std::string &source, bool fragment) {
   }
   std::string res;
   if (fragment) {
-    res = "#ifdef GL_ES\n"
-          "precision " +
-          std::string(source.find("#define HIGHP") != source.npos &&
-                              source.find("//#define HIGHP") == source.npos
-                          ? "highp"
-                          : "mediump") +
-          " float;\n"
-          "precision mediump int;\n"
-          "#else\n"
-          "#define lowp  \n"
-          "#define mediump \n"
-          "#define highp \n"
-          "#endif\n" +
-          source;
+    res =
+        "#ifdef GL_ES\n"
+        "precision " +
+        std::string(source.find("#define HIGHP") != source.npos &&
+                            source.find("//#define HIGHP") == source.npos
+                        ? "highp"
+                        : "mediump") +
+        " float;\n"
+        "precision mediump int;\n"
+        "#else\n"
+        "#define lowp  \n"
+        "#define mediump \n"
+        "#define highp \n"
+        "#endif\n" +
+        source;
   } else {
-    res = "#ifndef GL_ES\n"
-          "#define lowp  \n"
-          "#define mediump \n"
-          "#define highp \n"
-          "#endif\n" +
-          source;
+    res =
+        "#ifndef GL_ES\n"
+        "#define lowp  \n"
+        "#define mediump \n"
+        "#define highp \n"
+        "#endif\n" +
+        source;
   }
   return res;
 }
@@ -154,13 +161,30 @@ void Shader::compileShaders(const std::string &vertexShader,
     _isCompiled = false;
     return;
   }
+  program = linkProgram(createProgram());
+  if (program == -1) {
+    _isCompiled = false;
+    return;
+  }
+
   _isCompiled = true;
+}
+std::string Shader::getLog() const { return log; }
+bool Shader::isCompiled() const { return _isCompiled; }
+bool Shader::isDisposed() const { return disposed; }
+void Shader::bind() { Gl::useProgram(program); }
+void Shader::dispose() {
+  if (disposed) return;
+  Gl::useProgram(0);
+  Gl::deleteShader(vertexShaderHandle);
+  Gl::deleteShader(fragmentShaderHandle);
+  Gl::deleteProgram(program);
+  disposed = true;
 }
 Shader::ShaderKey Shader::loadShader(Shader::ShaderType type,
                                      const std::string &source) {
   ShaderKey shader = Gl::createShader(type);
-  if (shader == 0)
-    return -1;
+  if (shader == 0) return -1;
   Gl::shaderSource(shader, source.c_str());
   Gl::compileShader(shader);
   GInt isCompiled = 0;
@@ -175,7 +199,123 @@ Shader::ShaderKey Shader::loadShader(Shader::ShaderType type,
   }
   return shader;
 }
-Shader SpriteBatch::createShader() {}
+Shader::ProgramKey Shader::createProgram() {
+  Shader::ProgramKey program = Gl::createProgram();
+  return program != 0 ? program : -1;
+}
+Shader::ProgramKey Shader::linkProgram(Shader::ProgramKey program) {
+  if (program == -1) return -1;
+  Gl::attachShader(program, vertexShaderHandle);
+  Gl::attachShader(program, fragmentShaderHandle);
+  Gl::linkProgram(program);
+  GInt linked;
+  Gl::getProgramiv(program, Gl::LINK_STATUS, &linked);
+  if (linked == Gl::FALSE) {
+    log = Gl::getProgramInfoLog(program);
+    return -1;
+  }
+  return program;
+}
+
+void Blending::apply() {
+  Gl::enable(Gl::BLEND);
+  Gl::blendFuncSeparate(src, dst, srcAlpha, dstAlpha);
+}
+
+Blending::Blending(GEnum src, GEnum dst, GEnum srcAlpha, GEnum dstAlpha)
+    : src(src), dst(dst), srcAlpha(srcAlpha), dstAlpha(dstAlpha) {}
+
+Blending::Blending(GEnum src, GEnum dst)
+    : src(src), dst(dst), srcAlpha(src), dstAlpha(dst) {}
+DisableBlending::DisableBlending(GEnum src, GEnum dst, GEnum srcAlpha,
+                                 GEnum dstAlpha)
+    : Blending(src, dst, srcAlpha, dstAlpha) {}
+DisableBlending::DisableBlending(GEnum src, GEnum dst) : Blending(src, dst) {}
+Blending Blending::normal = Blending(Gl::SRC_ALPHA, Gl::ONE_MINUS_SRC_ALPHA);
+Blending Blending::additive = Blending(Gl::SRC_ALPHA, Gl::ONE);
+void DisableBlending::apply() { Gl::disable(Gl::BLEND); }
+DisableBlending DisableBlending::disable =
+    DisableBlending(Gl::SRC_ALPHA, Gl::ONE_MINUS_SRC_ALPHA);
+bool Blending::equal(Blending *blending) {
+  return src == blending->src && dst == blending->dst &&
+         srcAlpha == blending->srcAlpha && dstAlpha == blending->dstAlpha;
+}
+
+void Batch::z(float z) { m_z = sortAscending ? z : -z; }
+void Batch::setSort(bool sort) {}
+void Batch::setSortAscending(bool ascend) { sortAscending = ascend; }
+void Batch::setColor(const Color &tint) {
+  color.set(tint);
+  colorPacked = tint.toFloatBits();
+}
+void Batch::setColor(float r, float g, float b, float a) {
+  color.set(r, g, b, a);
+  colorPacked = color.toFloatBits();
+}
+Color Batch::getColor() const { return color; }
+Color Batch::getMixColor() const { return mixColor; }
+void Batch::setPackedColor(float packedColor) {
+  this->color.abgr8888(packedColor);
+  this->colorPacked = packedColor;
+}
+void Batch::setPackedMixColor(float packedColor) {
+  this->mixColor.abgr8888(packedColor);
+  this->mixColorPacked = packedColor;
+}
+float Batch::getPackedColor() const { return colorPacked; }
+float Batch::getPackedMixColor() const { return mixColorPacked; }
+void Batch::setMixColor(const Color &tint) {
+  mixColor.set(tint);
+  mixColorPacked = tint.toFloatBits();
+}
+void Batch::setMixColor(float r, float g, float b, float a) {
+  mixColor.set(r, g, b, a);
+  mixColorPacked = mixColor.toFloatBits();
+}
+void Batch::draw(Runnable request) { request(); }
+void Batch::setBlending(Blending *blending) {
+  if (!this->blending->equal(blending)) {
+    flush();
+  }
+  this->blending = blending;
+}
+Blending *Batch::getBlending() { return blending; }
+void Batch::dispose() {
+  mesh.dispose();
+  if (ownsShader) shader.dispose();
+}
+Shader SpriteBatch::createShader() {
+  return Shader(
+      "attribute vec4 a_position;"
+      "attribute vec4 a_color;"
+      "attribute vec2 a_texCoord0;"
+      "attribute vec4 a_mix_color;"
+      "uniform mat4 u_projTrans;"
+      "varying vec4 v_color;"
+      "varying vec4 v_mix_color;"
+      "varying vec2 v_texCoords;"
+      ""
+      "void main(){"
+      "   v_color = a_color;"
+      "   v_color.a = v_color.a * (255.0/254.0);"
+      "   v_mix_color = a_mix_color;"
+      "   v_mix_color.a *= (255.0/254.0);"
+      "   v_texCoords = a_texCoord0;"
+      "   gl_Position = u_projTrans * a_position;"
+      "}",
+
+      ""
+      "varying lowp vec4 v_color;"
+      "varying lowp vec4 v_mix_color;"
+      "varying highp vec2 v_texCoords;"
+      "uniform highp sampler2D u_texture;"
+      ""
+      "void main(){"
+      "  vec4 c = texture2D(u_texture, v_texCoords);"
+      "  gl_FragColor = v_color * mix(c, vec4(v_mix_color.rgb, c.a), "
+      "v_mix_color.a);"
+      "}");
+}
 std::string to_string(GLVersion version) { return version.toString(); }
 void Graphics::setupTask() {
   nova::Core::context->post(async::Timer(
@@ -188,7 +328,7 @@ void Graphics::setupTask() {
       0.0_asecond, std::chrono::milliseconds(16), -1));
 }
 
-} // namespace nova
+}  // namespace nova
 auto fmt::formatter<nova::GlType>::format(nova::GlType obj,
                                           format_context &ctx) const {
   return fmt::format_to(ctx.out(), "{}", nova::to_string(obj));
