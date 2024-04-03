@@ -147,9 +147,33 @@ std::string preprocess(const std::string &source, bool fragment) {
   return res;
 }
 void Shader::compileShaders(const std::string &vertexShader,
-                            const std::string &fragmentShader) {}
-int Shader::loadShader(int type, const std::string &source) {
-
+                            const std::string &fragmentShader) {
+  vertexShaderHandle = loadShader(Gl::VERTEX_SHADER, vertexShader);
+  fragmentShaderHandle = loadShader(Gl::FRAGMENT_SHADER, fragmentShader);
+  if (vertexShaderHandle == -1 || fragmentShaderHandle == -1) {
+    _isCompiled = false;
+    return;
+  }
+  _isCompiled = true;
+}
+Shader::ShaderKey Shader::loadShader(Shader::ShaderType type,
+                                     const std::string &source) {
+  ShaderKey shader = Gl::createShader(type);
+  if (shader == 0)
+    return -1;
+  Gl::shaderSource(shader, source.c_str());
+  Gl::compileShader(shader);
+  GInt isCompiled = 0;
+  Gl::getShaderiv(shader, Gl::COMPILE_STATUS, &isCompiled);
+  std::string infoLog = Gl::getShaderInfoLog(shader);
+  if (!infoLog.empty()) {
+    log += type == Gl::VERTEX_SHADER ? "Vertex shader\n" : "Fragment shader:\n";
+    log += infoLog;
+  }
+  if (isCompiled == Gl::FALSE) {
+    return -1;
+  }
+  return shader;
 }
 Shader SpriteBatch::createShader() {}
 std::string to_string(GLVersion version) { return version.toString(); }

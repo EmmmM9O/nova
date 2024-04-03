@@ -3,6 +3,7 @@
 
 #include "application.hpp"
 #include "core/Color.hpp"
+#include "core/Gl.hpp"
 #include "core/Math.hpp"
 #include "core/function.hpp"
 #include <filesystem>
@@ -51,6 +52,8 @@ public:
 };
 class Shader : public Disposable {
 public:
+  using ShaderKey = GUInt;
+  using ShaderType = GEnum;
   static std::string positionAttribute, texcoordAttribute, mixColorAttribute,
       colorAttribute, normalAttribute;
   static bool pedantic;
@@ -92,11 +95,12 @@ private:
   int linkProgram(int program);
   void compileShaders(const std::string &vertexShader,
                       const std::string &fragmentShader);
-  int loadShader(int type, const std::string &source);
+  ShaderKey loadShader(ShaderType type, const std::string &source);
   std::string fragmentShaderSource, vertexShaderSource;
   bool _isCompiled, disposed;
   std::string log = "";
-  int program, vertexShaderHandle, fragmentShaderHandle;
+  int program;
+  ShaderKey vertexShaderHandle, fragmentShaderHandle;
   std::vector<std::string> uniformNames, attributeNames;
 };
 class Blending {
